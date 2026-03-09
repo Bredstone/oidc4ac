@@ -1,75 +1,127 @@
 # OpenID Connect for Authentication Context (OIDC4AC)
 
-OpenID Connect for Authentication Context (OIDC4AC) is a proposed extension to OpenID Connect that enables Relying Parties (RPs) to request specific authentication factors, such as passwords, OTPs, biometrics, or hardware keys, and allows OpenID Providers (OPs) to represent Authentication Events with structured, detailed metadata.
+[![Spec Status](https://img.shields.io/badge/status-Early%20Working%20Draft-orange)](https://github.com/Bredstone/oidc4ac)
+[![Specification](https://img.shields.io/badge/specification-OIDC4AC-blue)](https://bredstone.github.io/oidc4ac/)
+[![Build](https://img.shields.io/github/actions/workflow/status/Bredstone/oidc4ac/pages.yml?label=build)](https://github.com/Bredstone/oidc4ac/actions)
 
-Instead of relying solely on the opaque `amr` array, OIDC4AC introduces the `amr_details` Claim, which provides a machine-readable description of how authentication was performed, including contextual evidence such as assurance level, trust framework, environmental attributes, and method-specific metadata.
+**Read the specification:** https://bredstone.github.io/oidc4ac/  
 
-This repository contains:
+## Overview
 
-- A draft specification of the OIDC4AC extension
-- A live-reload environment for building the draft using
-`mmark → xml2rfc → HTML`
+OIDC4AC extends OpenID Connect with mechanisms for representing authentication methods and communicating authentication requirements.
 
-This allows you to iteratively edit the Markdown source and automatically generate updated XML and HTML outputs.
+While the standard `amr` claim identifies which authentication methods were used, it provides a compact representation that does not capture method-specific properties or contextual authentication metadata. OIDC4AC introduces a structured representation of authentication context that includes method-specific properties, provenance information, and assurance-related metadata.
 
-## Running the Project
+**Key capabilities:**
 
-### Prerequisites
+- **Detailed representation**: Convey authentication method properties (e.g., password derivation algorithm, OTP parameters) along with contextual authentication metadata
+- **Structured requests**: Request authentication methods with constraints using logical operators (`all_of`, `one_of`) and quantitative filters (`min`, `max`, `max_age`)
+- **Interoperability**: Enable interoperable interpretation of authentication events across identity systems
+- **Backward compatibility**: Fully compatible with existing OpenID Connect flows; non-supporting implementations can safely ignore new elements
 
-- Docker
-- Docker Compose
+## Quick Example
 
-No other dependencies are required. All tools (`mmark`, `xml2rfc`, `inotify`) run inside the container.
+An `amr_details` claim representing multi-factor authentication:
 
-### Running the Live-Reload Environment
+```json
+{
+  "amr": ["pwd", "otp"],
+  "amr_details": [
+    {
+      "amr_identifier": "pwd",
+      "amr_metadata": {
+        "iss": "https://idp.example.com",
+        "trust_framework": "eidas",
+        "assurance_level": "low",
+        "time": "2025-09-30T18:23:41Z"
+      },
+      "amr_properties": {
+        "pwd_derivation_algorithm": "argon2id",
+        "pwd_policy_id": "password-policy-v2"
+      }
+    },
+    {
+      "amr_identifier": "otp",
+      "amr_metadata": {
+        "iss": "https://authbroker.example.com",
+        "trust_framework": "custom-framework",
+        "assurance_level": "substantial",
+        "time": "2025-09-30T18:23:45Z"
+      },
+      "amr_properties": {
+        "otp_length": 6,
+        "otp_algorithm": "TOTP"
+      }
+    }
+  ]
+}
+```
 
-To start the environment:
+Requesting specific authentication methods:
+
+```json
+{
+  "claims": {
+    "id_token": {
+      "amr_details": {
+        "all_of": [
+          {
+            "amr_identifier": { "value": "face" }
+          },
+          {
+            "one_of": [
+              { "amr_identifier": { "value": "pwd" } },
+              { "amr_identifier": { "value": "otp" } }
+            ]
+          }
+        ]
+      }
+    }
+  }
+}
+```
+
+## Documentation
+
+OIDC4AC is defined as an extension to OpenID Connect and introduces new claims, request syntax, and metadata elements. The specification defines:
+
+- Authentication Method Representation using the `amr_details` claim
+- Authentication Method Request syntax and operators
+- OpenID Provider metadata for capability discovery
+- Privacy and security considerations
+- Conformance requirements
+
+## Development
+
+### Building the Specification
+
+Build and preview the specification locally using Docker:
 
 ```bash
 docker compose up --build
 ```
 
-The container will:
+The live-reload environment monitors source files in `src/` and automatically regenerates the rendered specification in `docs/`.
 
-1. Watch src/main.md for changes
-2. Convert it to RFC XML using `mmark`
-3. Convert the XML to HTML (or other formats) using `xml2rfc`
-4. Automatically write all outputs to `docs/`
+### Repository Structure
 
-You'll see logs each time the draft is rebuilt.
-
-### Editing the Draft
-
-While the container is running, open any file inside `src` folder. Every save automatically regenerates:
-
-- `docs/index.xml` — canonical XML for `xml2rfc`
-- `docs/index.html` — formatted HTML RFC-style preview
-
-You can open `docs/index.html` in your browser to preview the rendered specification.
-
-### Changing the Output Format (optional)
-
-`xml2rfc` supports multiple output formats:
-
-- `html` (default)
-- `text`
-- `nroff`
-- `exp` (expanded XML)
-
-To change the format, edit the environment variable in `docker-compose.yml`:
-
-```yaml
-environment:
-  - FORMAT=text
+```
+src/          # Specification source (Markdown)
+docs/         # Generated HTML and XML output
+Dockerfile    # Build environment
+docker-compose.yml
 ```
 
-Or pass it inline:
+## Contributing
 
-```bash
-FORMAT=text docker compose up
-```
+This specification is in active development. Feedback and contributions are welcome through issues and pull requests.
 
-## About the Draft
+## Authors
 
-The full draft specification explaining the OIDC4AC model, the `amr_details` Claim, and the motivation for the protocol is included in this repository.
-It provides the formal definitions, schemas, and examples that underpin the protocol design.
+- **Brendon Vicente Rocha Silva** — Federal University of Santa Catarina (UFSC)
+- **Frederico Schardong** — Federal Institute of Education, Science and Technology of Rio Grande do Sul (IFRS)
+- **Ricardo Felipe Custódio** — Federal University of Santa Catarina (UFSC)
+
+## License
+
+No license has been specified yet.
