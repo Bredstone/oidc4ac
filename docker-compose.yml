@@ -3,10 +3,11 @@ version: "3.8"
 services:
   mmark:
     build: .
+    working_dir: /work
     volumes:
       - ./:/work
     environment:
-      - INPUT=src/main.md # arquivo que você edita
-      - XML_OUT=docs/index.xml # XML intermediário (mmark)
-      - FORMAT=html # formato de saída (html padrão)
+      - INPUT=src/main.md
+      - XML_OUT=docs/index.xml
+      - FORMAT=html
     tty: true

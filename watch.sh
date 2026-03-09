@@ -1,10 +1,10 @@
 #!/bin/sh
 set -e
 
-# Variável pública (única)
+# Public variables
 INPUT="${INPUT:-src/main.md}"
 
-# Variáveis derivadas (internas)
+# Derived variables (internal)
 XML_OUT="${XML_OUT:-docs/index.xml}"
 FORMAT="${FORMAT:-html}"
 WATCH_DIR="$(dirname "$INPUT")"
@@ -18,11 +18,11 @@ echo "Format          : '$FORMAT'"
 
 build() {
   if [ ! -f "$INPUT" ]; then
-    echo "WARNING: $INPUT ainda não existe. Crie o arquivo para iniciar o build."
+    echo "WARNING: $INPUT does not exist. Waiting for it to be created..."
     return
   fi
 
-  echo ">> Gerando XML com mmark..."
+  echo ">> Generating XML with mmark..."
   mmark "$INPUT" > "$XML_OUT"
   echo "   -> $XML_OUT"
 
@@ -32,24 +32,24 @@ build() {
     nroff) FORMATS="--nroff" ;;
     exp|xml) FORMATS="--exp" ;;
     *)
-      echo "Formato '$FORMAT' não reconhecido, usando html como padrão."
+      echo "Format '$FORMAT' not recognized, using html as default."
       FORMATS="--html"
       ;;
   esac
 
-  echo ">> Gerando saída com xml2rfc ($FORMAT)..."
+  echo ">> Generating output with xml2rfc ($FORMAT)..."
   xml2rfc "$XML_OUT" $FORMATS
-  echo "Build completo."
+  echo "Build complete."
 }
 
-# Build inicial
+# Initial build
 build
 
-# Watch recursivo no diretório do INPUT
+# Recursive watch for changes in the input directory
 while inotifywait -r \
   -e close_write,move,create,delete \
   "$WATCH_DIR"; do
   echo
-  echo "Mudanças detectadas em '$WATCH_DIR'. Rebuild iniciado..."
+  echo "Changes detected in '$WATCH_DIR'. Rebuild initiated..."
   build
 done

@@ -22,6 +22,10 @@ WORKDIR /work
 COPY watch.sh /usr/local/bin/watch.sh
 RUN chmod +x /usr/local/bin/watch.sh
 
+# One-shot build script
+COPY build.sh /usr/local/bin/build.sh
+RUN chmod +x /usr/local/bin/build.sh
+
 # Default values
 ENV INPUT=src/main.md \
     XML_OUT=docs/index.xml \
