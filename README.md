@@ -3,6 +3,7 @@
 [![Spec Status](https://img.shields.io/badge/status-Early%20Working%20Draft-orange)](https://github.com/Bredstone/oidc4ac)
 [![Specification](https://img.shields.io/badge/specification-OIDC4AC-blue)](https://bredstone.github.io/oidc4ac/)
 [![Build](https://img.shields.io/github/actions/workflow/status/Bredstone/oidc4ac/pages.yml?label=build)](https://github.com/Bredstone/oidc4ac/actions)
+[![License](https://img.shields.io/github/license/Bredstone/oidc4ac)](LICENSE)
 
 **Read the specification:** https://bredstone.github.io/oidc4ac/  
 
@@ -118,10 +119,12 @@ This specification is in active development. Feedback and contributions are welc
 
 ## Authors
 
-- **Brendon Vicente Rocha Silva** — Federal University of Santa Catarina (UFSC)
+- **Brendon Vicente Rocha Silva** — National Operator of the Civil Registry of Natural Persons (ONRCPN)
 - **Frederico Schardong** — Federal Institute of Education, Science and Technology of Rio Grande do Sul (IFRS)
 - **Ricardo Felipe Custódio** — Federal University of Santa Catarina (UFSC)
 
 ## License
 
-No license has been specified yet.
+This project is licensed under the Apache License 2.0.
+
+See the [LICENSE](LICENSE) file for details.
