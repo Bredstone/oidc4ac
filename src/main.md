@@ -62,4 +62,5 @@ The OpenID Foundation (OIDF) promotes, protects and nurtures the OpenID communit
 
 {{backmatter/examples.md}}
 {{backmatter/notices.md}}
+{{backmatter/acknowledgements.md}}
 {{backmatter/documentHistory.md}}
