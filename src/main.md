@@ -16,7 +16,7 @@ surname="Vicente"
 fullname="Brendon Vicente Rocha Silva"
 organization="ONRCPN"
     [author.address]
-    email = "bredstone13@gmail.com"
+    email = "brendon.vicente@onrcpn.org.br"
 
 [[author]]
 initials="F."
@@ -24,7 +24,7 @@ surname="Schardong"
 fullname="Frederico Schardong"
 organization="IFRS"
     [author.address]
-    email = "mail@frederico.phd"
+    email = "frederico.schardong@rolante.ifrs.edu.br"
 
 [[author]]
 initials="R."

@@ -119,9 +119,9 @@ This specification is in active development. Feedback and contributions are welc
 
 ## Authors
 
-- **Brendon Vicente Rocha Silva** — National Operator of the Civil Registry of Natural Persons (ONRCPN)
-- **Frederico Schardong** — Federal Institute of Education, Science and Technology of Rio Grande do Sul (IFRS)
-- **Ricardo Felipe Custódio** — Federal University of Santa Catarina (UFSC)
+- **Brendon Vicente Rocha Silva** — Operador Nacional do Registro Civil de Pessoas Naturais (ONRCPN)
+- **Frederico Schardong** — Instituto Federal do Rio Grande do Sul (IFRS)
+- **Ricardo Felipe Custódio** — Universidade Federal de Santa Catarina (UFSC)
 
 ## License
 
