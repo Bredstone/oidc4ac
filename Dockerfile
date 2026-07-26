@@ -10,8 +10,18 @@ FROM python:3.12-alpine
 # inotify for live reload
 RUN apk add --no-cache inotify-tools
 
-# xml2rfc (html, text, etc.)
-RUN pip install --no-cache-dir "xml2rfc"
+# Dependencies for WeasyPrint (PDF generation)
+RUN apk add --no-cache \
+    cairo-dev \
+    pango \
+    pango-dev \
+    libffi-dev \
+    build-base \
+    font-dejavu \
+    font-liberation
+
+# xml2rfc with PDF support
+RUN pip install --no-cache-dir "xml2rfc[pdf]"
 
 # Copy the mmark binary
 COPY --from=builder /go/bin/mmark /usr/local/bin/mmark

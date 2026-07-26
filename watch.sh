@@ -28,6 +28,7 @@ build() {
 
   case "$FORMAT" in
     html) FORMATS="--html" ;;
+    pdf) FORMATS="--pdf" ;;
     text|txt) FORMATS="--text" ;;
     nroff) FORMATS="--nroff" ;;
     exp|xml) FORMATS="--exp" ;;
