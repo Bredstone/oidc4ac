@@ -4,7 +4,7 @@ All examples in this appendix are non-normative and provided for illustrative pu
 
 ## Authentication Method Representation {#sec-auth-method-representation-examples}
 
-The following non-normative example illustrates an `amr_details` Claim representing an Authentication Event where the End-User authenticated using a password alongside a one-time password method provided by an external authentication broker. The example includes source/contextual information indicating the broker as the issuer of the OTP method including method-specific metadata such as OTP length and algorithm.
+The following example represents the complete Authentication Event relied upon for an authorization in which the End-User used a password and an OTP provided by an external authentication broker:
 
 ```JSON
 {
@@ -41,74 +41,67 @@ The following non-normative example illustrates an `amr_details` Claim represent
 
 ## Authentication Method Request {#sec-auth-method-request-examples}
 
-These examples illustrate how a RP can request specific Authentication Methods and attributes using the `claims` parameter in an OpenID Connect authentication request.
+### Voluntary and Essential Claim Requests
 
-### Userinfo Request Example
-
-This example demonstrates how to request an OTP Authentication Method with specific length constraints and algorithm via the UserInfo endpoint:
+A voluntary unconstrained request asks for the complete Claim when available:
 
 ```json
 {
   "claims": {
-    "userinfo": {
-      "amr_details": {
-        "amr_identifier": { "value": "otp" },
-        "amr_properties": {
-          "otp_length"   : null,
-          "otp_algorithm": { "value": "TOTP" }
-        }
-      }
+    "id_token": {
+      "amr_details": null
     }
   }
 }
 ```
 
-### Using `all_of` and `one_of` Operators
+An essential unconstrained request requires the complete Claim without prescribing the Authentication Methods:
 
-In the scenario below, the RP requests that the End-User authenticate using biometric authentication (`face`) along with either a password (`pwd`). Both methods are marked as essential:
+```json
+{
+  "claims": {
+    "id_token": {
+      "amr_details": { "essential": true }
+    }
+  }
+}
+```
+
+### Essential Single-Method Request
+
+The following request requires the Authentication Event to include facial recognition. Additional methods are not prohibited:
 
 ```json
 {
   "claims": {
     "id_token": {
       "amr_details": {
-        "all_of": [ 
-          {
-            "amr_identifier": {
-              "value": "face",
-              "essential": true
-            }
-          }, {
-            "amr_identifier": {
-              "value": "pwd",
-              "essential": true
-            }
-          } 
-        ]
+        "essential": true,
+        "amr_identifier": { "value": "face" }
       }
     }
   }
 }
 ```
 
-By using the `one_of` operator, the RP can request that the End-User authenticate using either a password (`pwd`) or a one-time password (`otp`):
+### Using `all_of` and `one_of`
+
+The following essential expression represents `(pwd AND pop) OR otp`:
 
 ```json
 {
   "claims": {
     "id_token": {
       "amr_details": {
+        "essential": true,
         "one_of": [
           {
-            "amr_identifier": { 
-              "value": "pwd"
-            }
+            "all_of": [
+              { "amr_identifier": { "value": "pwd" } },
+              { "amr_identifier": { "value": "pop" } }
+            ]
           },
-          {
-            "amr_identifier": {
-              "value": "otp"
-            }
-          }
+          { "amr_identifier": { "value": "otp" } }
         ]
       }
     }
@@ -116,32 +109,29 @@ By using the `one_of` operator, the RP can request that the End-User authenticat
 }
 ```
 
-#### Using `all_of` and `one_of` with Method Metadata
+Without the top-level `essential`, the same expression is a best-effort preference.
 
-It is also possible to combine the `all_of` and `one_of` operators with method metadata. In the following example, the RP requests OTP authentication with either numeric or alphanumeric format, along with biometric authentication:
+### Essential Method Property
+
+The following request requires either facial recognition with successful liveness detection or proof of possession:
 
 ```json
 {
   "claims": {
     "id_token": {
       "amr_details": {
-        "all_of": [
+        "essential": true,
+        "one_of": [
           {
-            "amr_identifier": { "value": "otp" },
+            "amr_identifier": { "value": "face" },
             "amr_properties": {
-              "one_of": [
-                {
-                  "otp_format": { "value": "alphanumeric" }
-                },
-                {
-                  "otp_format": { "value": "numeric" }
-                }
-              ]
+              "face_liveness_detection": {
+                "essential": true,
+                "value": true
+              }
             }
           },
-          {
-            "amr_identifier": { "value": "face" }
-          }
+          { "amr_identifier": { "value": "pop" } }
         ]
       }
     }
@@ -149,18 +139,25 @@ It is also possible to combine the `all_of` and `one_of` operators with method m
 }
 ```
 
-### Using `max` and `min` Operators
+The locally essential property affects only the `face` branch. It does not become an independent requirement if the `pop` branch matches.
 
-The following example demonstrates how to request an OTP Authentication Method with specific length constraints using the `min` and `max` operators:
+### Using `min`, `max`, and `max_age`
+
+The following essential request requires a recent OTP execution with a disclosed length between 6 and 10 digits:
 
 ```json
 {
   "claims": {
     "id_token": {
       "amr_details": {
+        "essential": true,
         "amr_identifier": { "value": "otp" },
+        "amr_metadata": {
+          "time": { "essential": true, "max_age": 300 }
+        },
         "amr_properties": {
-          "otp_length": { "min": 6, "max": 10 }
+          "otp_length": { "essential": true, "min": 6, "max": 10 },
+          "otp_algorithm": null
         }
       }
     }
@@ -168,18 +165,32 @@ The following example demonstrates how to request an OTP Authentication Method w
 }
 ```
 
-### Using `max_age` Operator
+If the existing OTP execution is older than 300 seconds, the OP must perform a fresh OTP execution to satisfy this expression. The `otp_algorithm` value is requested for disclosure but is not required for the method to match.
 
-The following example demonstrates how to request a biometric Authentication Method (`face`) with a requirement that the verification must have occurred within the last 300 seconds relative to the current processing time:
+### ID Token and UserInfo Delivery
+
+When ID Token and UserInfo contain different requests, their essential expressions are combined for the authorization transaction. Both returned Claims represent the same complete set of Authentication Method Executions, while optional fields may be disclosed independently.
 
 ```json
 {
   "claims": {
     "id_token": {
+      "amr_details": {
+        "essential": true,
+        "amr_identifier": { "value": "face" },
+        "amr_properties": {
+          "face_liveness_detection": {
+            "essential": true,
+            "value": true
+          }
+        }
+      }
+    },
+    "userinfo": {
       "amr_details": {
         "amr_identifier": { "value": "face" },
-        "amr_metadata"  : {
-          "time": { "max_age": 300 }
+        "amr_properties": {
+          "face_recognition_algorithm": null
         }
       }
     }
@@ -187,42 +198,16 @@ The following example demonstrates how to request a biometric Authentication Met
 }
 ```
 
-### Combined Requirements Example
+### Error Response
 
-In this example, the RP expresses a complex Authentication Requirement where the End-User must authenticate using a password (`pwd`) and either a one-time password (`otp`) or facial recognition (`face`) with specific constraints:
+If an essential expression cannot be satisfied, the OP returns an Authorization Error Response containing:
 
-```json
-{
-  "claims": {
-    "id_token": {
-      "amr_details": {
-        "all_of": [
-          {
-            "amr_identifier": { "value": "pwd", "essential": true }
-          },
-          {
-            "one_of": [
-              {
-                "amr_identifier": { "value": "otp" },
-                "amr_properties": {
-                  "otp_length"   : { "min": 6, "max": 10 },
-                  "otp_algorithm": { "value": "TOTP" }
-                }
-              },
-              {
-                "amr_identifier": { "value": "face" },
-                "amr_metadata"  : {
-                  "time": { "max_age": 300 }
-                }
-              }
-            ]
-          }
-        ]
-      }
-    }
-  }
-}
+```text
+error=unmet_authentication_requirements
+error_description=The requested authentication requirements could not be satisfied.
 ```
+
+The description does not reveal enrollment state, method availability, or verification failure.
 
 ## OP Metadata {#sec-op-metadata-example}
 
@@ -237,12 +222,11 @@ The following example illustrates an OP metadata document indicating support for
   "jwks_uri": "https://op.example.com/jwks",
   "claims_supported": [ "sub", "name", "email", "amr_details" ],
   "amr_details_request_supported": true,
-  "amr_identifiers_supported": [ "pwd", "otp", "face" ],
+  "amr_identifiers_supported": [ "pwd", "otp", "face", "pop" ],
   "pwd_properties_supported": [ "pwd_derivation_algorithm", "pwd_policy_id" ],
   "otp_properties_supported": [ "otp_length", "otp_algorithm" ],
-  "face_properties_supported": [ "face_recognition_algorithm", "face_image_quality" ],
+  "face_properties_supported": [ "face_recognition_algorithm", "face_liveness_detection" ],
   "pwd_derivation_algorithm_values_supported": [ "argon2id", "bcrypt", "scrypt" ],
-  "pwd_policy_id_values_supported": [ "gov-password-v1", "gov-password-v2" ],
   "otp_algorithm_values_supported": [ "TOTP", "HOTP" ],
   "face_recognition_algorithm_values_supported": [ "cnn", "eigenfaces", "fisherfaces" ],
   "trust_framework_values_supported": [ "eidas" ],
