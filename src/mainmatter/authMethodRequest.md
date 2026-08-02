@@ -1,30 +1,8 @@
 # Requesting Authentication Methods {#sec-req}
 
-Authentication Methods and their properties are requested during the authentication process using the `amr_details` Claim within the `claims` parameter, as defined in [Section 5.5](https://openid.net/specs/openid-connect-core-1_0.html#ClaimsParameter) of [@!OpenID.Core, OIDC Core]. This mechanism allows RPs to express their assurance requirements and policy constraints in a standardized manner, granting them greater control over the Authentication Event. Clients can specify not only *which* Authentication Methods are required but also *how* those methods should be executed.
+Authentication Methods and their properties are requested during the authentication process using the `amr_details` Claim within the `claims` parameter, as defined in [Section 5.5](https://openid.net/specs/openid-connect-core-1_0.html#ClaimsParameter) of [@!OpenID.Core, OIDC Core]. This mechanism allows RPs to express assurance requirements and policy constraints in a standardized manner. RPs can specify not only *which* Authentication Methods they prefer or require, but also constraints on *how* those methods are performed.
 
-Unlike the representation of Authentication Methods used in the authentication response (which is a JSON Array), the `amr_details` Claim within the authentication request **MUST** be a JSON Object. This object serves as a logical template or filter that the OP **MUST** satisfy to issue the token.
-
-Within the `amr_details` expression object, the RP **MAY**:
-
-- Request the presence of specific attributes by using `null` values;
-- Express value constraints using the `value` and `essential` operators;
-- Group requirements using logical operators `all_of` and `one_of`.
-
-A non-normative example of negotiating Authentication Methods and attributes using the `claims` parameter is provided below:
-
-```json
-{
-  "id_token": {
-    "amr_details": {
-      "amr_identifier": { "value": "pwd", "location": null },
-      "amr_properties": {
-        "pwd_derivation_algorithm": null,
-        "pwd_policy_id"           : null
-      }
-    }
-  }
-}
-```
+Unlike the representation of Authentication Methods in a response, whose value is a JSON array, an individual `amr_details` Claim request **MUST** be either `null` or a JSON object. A `null` request asks for voluntary disclosure of the complete Claim without prescribing Authentication Methods. A JSON object is an outer Claim Request Object: it **MAY** contain the top-level `essential` member and **MAY** contain exactly one Authentication Method Request Expression. An object that contains only `essential`, or neither `essential` nor an expression, is an unconstrained request. The syntax and semantics of Claim requests and expressions are defined below.
 
 Besides including the `amr_details` Claim within the `claims` parameter in authentication requests, this specification does not define any other means for requesting Authentication Methods. However, some deployments **MAY** choose to negotiate or request Authentication Methods through scope values (*e.g.*, `scope=pwd+otp`) provided there is prior agreement between the RP and the OP regarding the semantics of such scopes. Such approaches are possible under OIDC Core but fall outside the normative scope of this specification.
 
@@ -35,28 +13,31 @@ The request structure for `amr_details` introduces a set of operators and constr
 {newline="true"}
 `one_of` and `all_of`
 
-: Logical operators for combining multiple Authentication Methods or attributes within a single request element. By using these operators, RPs can request combinations of methods and attributes with specific logical relationships: for example, requiring at least one method from a set (`one_of`) or mandating that all specified methods be used (`all_of`). These operators **MUST** only be used to group JSON objects rather than primitive values. If RPs need to express logical combinations of primitive values, they **MUST** use the `one_of` and `all_of` operators at the parent object level and make use of the `value` attribute within each grouped object. For example, to request either `TOTP` or `HOTP` as the OTP algorithm, the following structure would be used:
+: Logical operators for combining Authentication Method Request Expressions. An `all_of` expression matches when every child expression matches. A `one_of` expression matches when at least one child expression matches; it does not require exactly one matching child. Their values **MUST** be non-empty JSON arrays whose elements are Authentication Method Request Expressions. Expressions **MAY** be nested recursively. The same Authentication Method Execution **MAY** satisfy more than one child expression, including children of the same `all_of` expression; this specification does not define an operator that requires distinct executions. Failure of one `one_of` branch does not prevent another branch from satisfying the expression, and attempting a branch does not commit the OP to that branch. Array order does not define a preference order.
 
-```json
-{
-  "otp_algorithm": {
-    "one_of": [
-      { "value": "TOTP" },
-      { "value": "HOTP" }
-    ]
-  }
-}
-```
+`null`
+
+: Requests disclosure of the named metadata or property when available and permitted.
+
+`value`
+
+: Expresses one acceptable value. The `amr_identifier` constraint **MUST** contain a single `value` member whose value is a string identifying one Authentication Method. Alternatives between Authentication Methods or Authentication Method Request Expressions **MUST** be represented using `one_of`. For metadata and properties, `value` expresses a value constraint whose effect depends on `essential`, as defined in (#essential-logic).
+
+`values`
+
+: Expresses a set of acceptable values for a metadata or property field. The `values` member **MUST** be a non-empty JSON array and **MUST NOT** be used with `amr_identifier`. `value` and `values` **MUST NOT** occur in the same constraint. Alternatives between primitive metadata or property values **MUST** be expressed using `values`, rather than by placing `one_of` or `all_of` inside a field constraint.
 
 `min` and `max`
 
-: Quantitative constraints applicable to numeric attributes. These operators **MUST** only be evaluated when the target attribute is a JSON Number. If a type mismatch occurs (*e.g.*, applying `min` to a JSON String), or if the attribute value does not satisfy the constraint, the OP **MUST** ignore the constraint for processing purposes, consistent with the treatment of descriptive attributes described in (#essential-logic).
+: Quantitative constraints applicable only to JSON Numbers. A type mismatch or a value outside the requested range means that the constraint is not satisfied. When both are present, `min` **MUST NOT** be greater than `max`.
 
 `max_age`
 
-: Temporal constraint indicating the maximum allowable age, in seconds, of an Authentication Method execution relative to the current request processing time. If the elapsed time since `amr_metadata.time` exceeds this value, the OP **SHOULD NOT** generate an error; instead, it **MUST** report the actual `amr_metadata.time` in the response, allowing the RP to enforce its own freshness policy.
+: A temporal constraint, in seconds, that **MAY** appear only in an `amr_metadata.time` constraint and is applied to the actual execution time of the corresponding Authentication Method Execution. Its value **MUST** be a non-negative integer. A non-essential `max_age` is a best-effort freshness preference: the OP **SHOULD** attempt a fresh execution but **MAY** reuse an older execution and report its actual execution time. When locally essential, the execution used to match the method expression **MUST** be within the requested age. If an existing execution is too old, the OP **MUST** perform a fresh execution of that method to satisfy the constraint. Executing another method or refreshing the general session **MUST NOT** change the execution time of the requested method.
 
-These operators and constraints allow RPs to express complex Authentication Requirements in a structured and machine-interpretable manner, enhancing the negotiation capabilities of the OIDC protocol. The following non-normative example illustrate the use of these operators to express an authentication proccess where biometric authentication is required along with either a password or another OTP:
+Each Authentication Method Request Expression object **MUST** contain exactly one of `amr_identifier`, `all_of`, or `one_of`. A single-method expression **MAY** also contain `amr_metadata` and `amr_properties` constraints applying to that method. The value of `amr_identifier` **MUST** be a non-empty object containing exactly one `value` member whose value is a string identifying one Authentication Method. Each requested metadata or property field **MUST** have either a `null` value or a non-empty constraint object. When multiple constraint operators occur in the same object, they are evaluated conjunctively. The Claim Request Object's top-level `essential` member **MAY** appear only in the outer `amr_details` Claim Request Object and **MUST** be a JSON Boolean. A constraint object for an `amr_metadata` or `amr_properties` field **MAY** contain its own `essential` member, which **MUST** be a JSON Boolean and has the local semantics defined in (#essential-logic). A constraint-level `essential` **MUST NOT** appear in `amr_identifier`, and neither form of `essential` **MUST** appear in a nested logical expression object. An empty expression, an empty logical-operator array, an expression containing more than one expression-form member, an unknown operator, `max_age` outside `amr_metadata.time`, or an invalid JSON type **MUST** result in `invalid_request`. An unsupported Authentication Method causes the corresponding single-method expression not to match. An unrecognized metadata or property field has no matching value; a locally essential constraint on that field causes the corresponding single-method expression not to match, while a non-essential constraint does not prevent it from matching. The OP **MUST NOT** fabricate or disclose a value for an unrecognized field.
+
+The following non-normative example expresses a preference for facial recognition together with either a password or an OTP:
 
 ```json
 {
@@ -74,7 +55,10 @@ These operators and constraints allow RPs to express complex Authentication Requ
               },
               {
                 "amr_identifier": { "value": "otp" },
-                "amr_properties": { "otp_length": null, "otp_algorithm": null }
+                "amr_properties": {
+                  "otp_length": null,
+                  "otp_algorithm": null
+                }
               }
             ]
           }
@@ -87,66 +71,72 @@ These operators and constraints allow RPs to express complex Authentication Requ
 
 More examples of requesting Authentication Methods and attributes using the `claims` parameter are provided in (#sec-auth-method-request-examples).
 
-## Logical Operators and the `essential` Clause {#essential-logic}
+## Essential and Non-Essential Requests {#essential-logic}
 
 The semantic interpretation of the `essential` parameter within logical structures is defined as follows:
 
-- When `essential` is applied to the `amr_details` claim as a whole, or to descriptive attributes of Authentication Methods (such as metadata or properties), its behavior follows the behavior described in [Section 5.5.1](https://openid.net/specs/openid-connect-core-1_0.html#IndividualClaimsRequests) of [@!OpenID.Core, OIDC Core]. In such cases, the Authorization Server **MUST NOT** generate an error if the requested information is not returned, regardless of whether it is marked as Essential or Voluntary.
+- When applied to the top-level `amr_details` Claim Request Object, `essential` serves two purposes:
+  1. If the `amr_details` Claim request is unconstrained (contains no expression), `essential` indicates whether the RP requires the OP to return a complete and conforming `amr_details` Claim. If `essential` is omitted or set to `false`, the OP **MAY** return a complete Claim but **MAY** also omit it without causing authentication failure.
+  2. If the `amr_details` Claim request contains an Authentication Method Request Expression, `essential` indicates whether the RP requires the OP to satisfy the expression. If `essential` is omitted or set to `false`, the OP **SHOULD** attempt to satisfy the expression but **MAY** continue according to its own authentication policy if it cannot do so. If `essential` is set to `true`, the OP **MUST** satisfy the expression and return a complete and conforming `amr_details` Claim; otherwise, it **MUST** fail the request as specified in (#sec-error-handling).
 
-- When `essential` is applied to a specific Authentication Method, identified through the `amr_identifier` element, it expresses a strict Authentication Requirement. If the Authorization Server is unable to authenticate the End-User using the specified Authentication Method, the Authorization Server **MUST** treat that outcome as a failed authentication attempt. The following rules apply when evaluating `essential` within different contexts of the requirement expression:
+- When `essential` is applied to an Authentication Method Metadata or Authentication Method Properties constraint, it indicates whether the RP requires the OP to satisfy that specific constraint. When set to `true`, the named field **MUST** be present and its value **MUST** satisfy the constraint for the corresponding Authentication Method Execution to match the single-method expression. When omitted or set to `false`, the constraint is best-effort and does not prevent the method from matching. A locally essential constraint affects only the expression in which it occurs and does not become an independent requirement outside an enclosing `one_of` expression.
 
-    {newline="true"}
-    **Within `all_of`**
-    
-    : All elements marked as `essential` within an `all_of` group **MUST** be satisfied. Failure to satisfy any essential element results in an authentication failure.
-
-    **Within `one_of`**
-    
-    : If a `one_of` group is required, the OP **MUST** satisfy at least one path that meets the essentiality requirements. If the RP marks specific elements within a `one_of` group as `essential`, it indicates a mandatory preference. If none of the essential elements within the group can be satisfied, the OP **MUST** treat the attempt as a failure, even if non-essential elements are available.
-
-**Note:** This distinction allows RPs to strictly require specific Authentication Methods when necessary, while preserving OpenID Connect compatibility and avoiding unnecessary authentication failures when only descriptive authentication information is unavailable.
-
-A non-normative example of requesting a password-based Authentication Method as essential is provided below:
+For example, the following request requires either facial recognition with successful liveness detection or proof of possession of a key:
 
 ```json
 {
   "claims": {
     "id_token": {
       "amr_details": {
-        "amr_identifier": {
-          "value"    : "pwd",
-          "essential": true
-        }
+        "essential": true,
+        "one_of": [
+          {
+            "amr_identifier": { "value": "face" },
+            "amr_properties": {
+              "face_liveness_detection": {
+                "essential": true,
+                "value": true
+              }
+            }
+          },
+          {
+            "amr_identifier": { "value": "pop" }
+          }
+        ]
       }
     }
   }
 }
 ```
 
+If `face_liveness_detection` is absent or false, only the `face` branch fails; the `pop` branch can still satisfy the expression.
+
 ## Processing Requirements {#sec-processing-requirements}
 
-When processing an `amr_details` request, the Authorization Server **MUST** evaluate the requirement expression as follows:
+An OP that declares `amr_details_request_supported` as `true` **MUST** process an `amr_details` request as follows:
 
-- The OP **MUST** attempt to satisfy the logical tree of the expression, prioritizing Authentication Methods that fulfill `essential: true` criteria applied to the `amr_identifier` element.
+- Validate the request structure and return an `invalid_request` error when it is malformed;
 
-- For all other attributes, including metadata in `amr_properties` or contextual info in `amr_metadata`, the OP **SHOULD** perform a "best-effort" satisfaction of the constraints. Type mismatches or unsatisfied quantitative/temporal constraints on these descriptive attributes **MUST NOT** result in an authentication failure at the OP level.
+- Plan and perform authentication according to its own policy while considering the requested expression;
 
-- The OP **MAY** provide more information than requested if such data is mandatory under its own policy, or less information if some parameters are optional or unsupported.
+- Evaluate a single-method expression as matching when at least one successful Authentication Method Execution has an acceptable `amr_identifier` and satisfies every locally essential metadata or property constraint;
 
-- If an Authentication Method explicitly identified through the `amr_identifier` element is marked as `essential` and cannot be satisfied, the Authorization Server **MUST** return an error as defined in (#sec-error-handling).
+- Evaluate logical expressions according to the `all_of` and `one_of` semantics defined above;
 
-- In all other cases, the OP **SHOULD** proceed with the authentication and return the `amr_details` claim reflecting the methods and metadata employed, enabling the RP to perform its own final policy evaluation.
+- Return an error as specified in (#sec-error-handling) when a top-level essential request cannot be satisfied;
 
-This behavior preserves continuity of authentication while maintaining transparency for the RP, which can then evaluate the returned `amr_details` against its own acceptance criteria. If the RP requires strict adherence to its requested Authentication Methods, it **MUST** implement its own logic to assess the returned `amr_details` and decide whether to accept or reject the authentication based on the actual methods employed. The OP is not responsible for enforcing the RP's policies beyond attempting to meet the requested conditions.
+- For a non-essential request that cannot be satisfied, the OP **MAY** continue according to its own authentication policy and return the `amr_details` Claim describing the Authentication Event that actually occurred.
+
+Non-essential metadata and property constraints **SHOULD** be satisfied on a best-effort basis and **MUST NOT** independently cause authentication failure. Requested values **MUST NOT** replace the values that were actually observed. Claim completeness, disclosure, consistency across delivery locations, and snapshot reuse are governed by (#sec-amr-details-delivery).
+
+RPs **MUST** evaluate the returned `amr_details` Claim against their local policies, particularly when the request is non-essential. RPs seeking an abstract assurance level rather than a concrete Authentication Method **SHOULD** use `acr` and use `amr_details` to understand how the OP satisfied that assurance requirement.
 
 ## Error Handling {#sec-error-handling}
 
-This specification does not introduce new error codes, error responses, or error handling mechanisms beyond those defined by [@!OpenID.Core, OpenID Connect Core] and related specifications. However, specific error conditions arise from the processing of `amr_details` requests and Authentication Method requirements:
+A malformed request structure, invalid JSON type, unknown or prohibited operator, empty expression, or structurally invalid combination **MUST** result in `invalid_request`.
 
-- If a requirement expression contains Authentication Methods or constraints marked as `essential` that cannot be satisfied (due to OP limitations, End-User unavailability of factors, or verification failure), the Authorization Server **MUST** interrupt the flow and return an error to the RP.
+If an essential `amr_details` Claim request or Authentication Method Request Expression cannot be satisfied, the OP **MUST** return the `unmet_authentication_requirements` error defined by [@!OpenID.UnmetAuthn, OpenID Connect Core Error Code unmet_authentication_requirements]. This includes inability to produce a complete and conforming Claim, failure of every expression branch because of a locally essential constraint, or inability to perform a required fresh Authentication Method Execution.
 
-- The OP **MUST** use the `access_denied` error code, as defined in [Section 4.1.2.1](https://www.rfc-editor.org/rfc/rfc6749#section-4.1.2.1) of [@!RFC6749, RFC 6749]. The OP **SHOULD** include an `error_description` parameter detailing which part of the requirement expression (*e.g.*, which `amr_identifier`) could not be satisfied to assist the RP in guiding the End-User.
+The public `error_description` **MUST** remain generic and **MUST NOT** identify the method or distinguish lack of enrollment, unsupported or unavailable methods, missing credentials, verification failure, or failure of a method-specific constraint. Detailed diagnostics **MAY** be logged internally or displayed locally by the OP.
 
-All other error conditions arising from the processing of `amr_details` requests and Authentication Method requirements **MUST** be handled in accordance with the error handling rules defined by [@!OpenID.Core, OIDC], including those applicable to the Authorization Endpoint, Token Endpoint, and other relevant protocol endpoints.
-
-If the Authorization Server does not support processing Authentication Method requirements conveyed through the `claims` parameter, as indicated by the absence of support declaration in its metadata, the Authorization Server **MUST NOT** treat such requests as an error. In this case, the Authorization Server **SHOULD** ignore the Authentication Method requirements and proceed with authentication according to its default behavior, subject to its internal policies and capabilities.
+The `access_denied` error **SHOULD** be used when the End-User explicitly cancels or refuses the authentication or authorization request.

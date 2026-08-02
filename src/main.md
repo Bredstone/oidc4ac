@@ -47,13 +47,14 @@ Recipients of this draft are invited to submit, with their comments, notificatio
 
 .# Foreword
 
-The OpenID Foundation (OIDF) promotes, protects and nurtures the OpenID community and technologies. As a non-profit international standardizing body, it is comprised by over 160 participating entities (workgroup participants). The work of preparing implementer drafts and final international standards is carried out through OIDF workgroups in accordance with the OpenID Process. Participants interested in a subject for which a workgroup has been established has the right to be represented in that workgroup. International organizations, governmental and non-governmental, in liaison with OIDF, also take part in the work. OIDF collaborates closely with other standardizing bodies in the related fields.
+The OpenID Foundation (OIDF) promotes, protects and nurtures the OpenID community and technologies. As a non-profit international standardizing body, it is composed of over 160 participating entities (workgroup participants). The work of preparing implementer drafts and final international standards is carried out through OIDF workgroups in accordance with the OpenID Process. Participants interested in a subject for which a workgroup has been established have the right to be represented in that workgroup. International organizations, governmental and non-governmental, in liaison with OIDF, also take part in the work. OIDF collaborates closely with other standardizing bodies in the related fields.
 
 {mainmatter}
 
 {{mainmatter/introduction.md}}
 {{mainmatter/authMethodRepresentation.md}}
 {{mainmatter/authMethodRequest.md}}
+{{mainmatter/amrDetailsDelivery.md}}
 {{mainmatter/opMetadata.md}}
 {{mainmatter/conformance.md}}
 {{mainmatter/references.md}}

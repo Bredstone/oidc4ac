@@ -25,29 +25,31 @@ This declaration does not imply that the OP supports processing Authentication M
 
 ## Request Processing Support for Authentication Method Negotiation
 
-An OP that supports processing Authentication Method requirements expressed through the `claims` parameter, including constraints and essentiality applied to Authentication Methods, **MUST** declare this capability using the following metadata parameter:
+An OP that supports processing Authentication Method requirements expressed through the `claims` parameter, including top-level essentiality and method-specific constraints, **MUST** support informational delivery of `amr_details` and declare that capability in `claims_supported`. It **MUST** also declare its request-processing capability using the following metadata parameter:
 
 {newline="true"}
 `amr_details_request_supported`
 
-: OPTIONAL. Boolean value indicating whether the OP supports processing Authentication Method requests conveyed via the `claims` parameter, as defined in this specification. If omitted or set to `false`, the OP does not process Authentication Method requirements and treats any such request as informational only. An OP that sets `amr_details_request_supported` to `true` **MUST** comply with the processing rules defined in this specification for Authentication Method requests, including the handling of essential authentication factors and authentication failure conditions.
+: OPTIONAL. Boolean value indicating whether the OP supports processing Authentication Method requests conveyed via the `claims` parameter, as defined in this specification. If omitted or set to `false`, the OP does not process Authentication Method requirements and treats any such request as informational only. An OP that sets `amr_details_request_supported` to `true` **MUST** comply with the processing rules defined in this specification for Authentication Method requests, including the handling of essential Claim requests, essential expressions, and authentication failure conditions.
 
 RPs that require strict enforcement of Authentication Method requirements **MUST** verify that `amr_details_request_supported` is set to `true` before issuing such requests.
+
+If `amr_details_request_supported` is omitted or set to `false`, the OP **MUST NOT** treat an Authentication Method expression received through the `claims` parameter as an error. It **SHOULD** ignore the expression and proceed according to its default behavior, subject to its internal policies and capabilities. A request for the `amr_details` Claim itself remains subject to the OP's informational support and ordinary Claim processing rules.
 
 The following metadata parameters are OPTIONAL and provide additional information about the Authentication Methods and constraints supported by the OP. When present, they **MUST** accurately reflect the provider's capabilities.
 
 {newline="true"}
 `amr_identifiers_supported`
 
-: OPTIONAL. JSON array of strings. Enumerates Authentication Methods supported by the OP, preferably using identifiers registered in [@!RFC8176, RFC 8176] (*e.g.*, `pwd`, `otp`, `face`, `hwk`).
+: OPTIONAL. JSON array of strings. Enumerates Authentication Method Identifiers that the OP is capable of returning in `amr_details` and, when `amr_details_request_supported` is `true`, processing in Authentication Method Request Expressions. This parameter is an informational capability advertisement and does not assert that every listed identifier is available for every End-User or authorization transaction. Identifiers SHOULD be registered in [@!RFC8176, RFC 8176] when applicable (*e.g.*, `pwd`, `otp`, `face`, `hwk`).
 
 `<amr>_properties_supported`
 
-: OPTIONAL. For each Authentication Method `<amr>` listed in `amr_identifiers_supported`, the OP **MAY** declare a corresponding metadata field named `<amr>_properties_supported`. This field is a JSON array of strings enumerating the specific metadata supported by the OP for that Authentication Method. For example, if `otp` is listed in `amr_identifiers_supported`, the OP **SHOULD** declare `otp_properties_supported` to indicate which OTP-related attributes (*e.g.*, `otp_length`, `otp_algorithm`) it can process or provide. The OP **SHOULD** use the attribute names defined in (#sec-method-properties) of this specification.
+: OPTIONAL. For each Authentication Method `<amr>` listed in `amr_identifiers_supported`, the OP **MAY** declare a corresponding metadata field named `<amr>_properties_supported`. This field is a JSON array of strings enumerating the specific properties that the OP can return in `amr_details` and, when `amr_details_request_supported` is `true`, process in Authentication Method Request Expressions. This parameter is an informational capability advertisement and does not assert that every listed property is available for every End-User or Authentication Method Execution. For example, if `otp` is listed in `amr_identifiers_supported`, the OP **SHOULD** declare `otp_properties_supported` to indicate which OTP-related properties (*e.g.*, `otp_length`, `otp_algorithm`) it can process or provide. The OP **SHOULD** use the property names defined in (#sec-method-properties) of this specification.
 
-`<amr_properties>_values_supported`
+`<property>_values_supported`
 
-: OPTIONAL. For each `amr_properties` parameter defined in (#sec-method-properties), the OP **MAY** declare a corresponding metadata field named `<amr_properties>_values_supported`. This field is a JSON array of strings enumerating the specific values supported by the OP for that `amr_properties` parameter. For example, if `otp_algorithm` is defined (*i.e.*, `otp_properties_supported` contains `otp_algorithm`), the OP **MUST** declare `otp_algorithm_values_supported` to indicate which OTP algorithms (*e.g.*, `TOTP`, `HOTP`) it can process or provide. The OP **SHOULD** use the value names defined in (#sec-method-properties) of this specification whenever possible.
+: OPTIONAL. For a string-valued property, an OP **MAY** declare a corresponding metadata field named `<property>_values_supported` when the values it can return or, when `amr_details_request_supported` is `true`, process can be represented by a finite JSON array of strings. This field enumerates the OP's supported values; it does not assert that the array exhausts the property's vocabulary as defined by its profile. It **MUST NOT** be used to enumerate numbers, booleans, timestamps, objects, identifiers, or an open or unbounded value domain. The JSON type and semantics of each property are defined by the applicable Authentication Method Properties profile and need not be repeated in Discovery. Advertising a property indicates capability; it does not imply that the property is available for every End-User or Authentication Method Execution, or that every requested value can be satisfied.
 
 `trust_framework_values_supported`
 
@@ -62,4 +64,3 @@ The following metadata parameters are OPTIONAL and provide additional informatio
 : OPTIONAL. JSON array of strings. List of supported location-related attributes within the `amr_metadata.location` object. It **MAY** include any combination of the following values: `formatted`, `street_address`, `locality`, `region`, `postal_code`, `country`, `ip_address`, `latitude`, `longitude`, `precision`.
 
 An example OP Metadata declaration including these parameters is provided in (#sec-op-metadata-example).
-
