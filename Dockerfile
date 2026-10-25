@@ -2,7 +2,7 @@
 FROM golang:alpine3.22 AS builder
 
 RUN apk add --no-cache git
-RUN go install github.com/mmarkdown/mmark/v2@v2.2.25
+RUN go install github.com/mmarkdown/mmark/v2@v2.2.48
 
 # Stage 2: Python + xml2rfc
 FROM python:3.12-alpine

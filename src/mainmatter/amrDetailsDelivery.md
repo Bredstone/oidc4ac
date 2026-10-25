@@ -2,7 +2,7 @@
 
 This section defines the rules governing *when* and *how* the `amr_details` Claim is returned by the OP.
 
-The delivery of the `amr_details` Claim follows the general OIDC principles for Claims issuance defined in [Section 5](https://openid.net/specs/openid-connect-core-1_0.html#Claims) of [@!OpenID.Core, OIDC Core], subject to the additional completeness, consistency, and essential-request rules defined by this specification.
+The delivery of the `amr_details` Claim follows the general OIDC principles for Claims issuance defined in [Section 5](https://openid.net/specs/openid-connect-core-1_0.html#Claims) of OIDC Core [@!OpenID.Core], subject to the additional completeness, consistency, and essential-request rules defined by this specification.
 
 ## Conditions for Delivery of the `amr_details` Claim
 
@@ -26,7 +26,7 @@ If `amr_details` is included in an ID Token returned in response to a refresh to
 
 ## Delivery Mechanisms
 
-When an RP explicitly requests the `amr_details` Claim, the OP **MUST**, subject to the omission and error rules above, return the Claim in the location or locations specified in the request, such as within the ID Token or via the UserInfo Endpoint, as defined by [@!OpenID.Core, OIDC Core]. If the RP does not explicitly request the Claim and the OP elects to return it based on internal policy, the OP **MAY** choose the delivery location.
+When an RP explicitly requests the `amr_details` Claim, the OP **MUST**, subject to the omission and error rules above, return the Claim in the location or locations specified in the request, such as within the ID Token or via the UserInfo Endpoint, as defined by OIDC Core [@!OpenID.Core]. If the RP does not explicitly request the Claim and the OP elects to return it based on internal policy, the OP **MAY** choose the delivery location.
 
 Claims delivered through different locations for the same authorization grant **MUST** represent the same complete set of Authentication Method Executions. Optional metadata and properties disclosed for each execution **MAY** differ according to the request and applicable disclosure policy (see (#sec-disclosure-policy)). Any field disclosed in more than one location **MUST** have the same value and semantic meaning.
 

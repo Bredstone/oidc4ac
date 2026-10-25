@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- name="GENERATOR" content="github.com/mmarkdown/mmark Mmark Markdown Processor - mmark.miek.nl" -->
-<rfc version="3" ipr="none" docName="openid-connect-4-authentication-context-1_0-00" submissionType="IETF" category="std" xml:lang="en" xmlns:xi="http://www.w3.org/2001/XInclude" indexInclude="true" consensus="true">
+<rfc version="3" ipr="none" docName="openid-connect-4-authentication-context-1_0-00" submissionType="IETF" category="std" xml:lang="en" xmlns:xi="http://www.w3.org/2001/XInclude" indexInclude="true">
 
 <front>
-<title abbrev="openid-connect-4-authentication-context-1_0">OpenID Connect for Authentication Context 1.0</title><seriesInfo value="openid-connect-4-authentication-context-1_0-00" status="standard" name="OpenID-Draft"></seriesInfo>
+<title abbrev="openid-connect-4-authentication-context-1_0">OpenID Connect for Authentication Context 1.0</title><seriesInfo value="openid-connect-4-authentication-context-1_0-00" stream="IETF" status="standard" name="OpenID-Draft"></seriesInfo>
 <author initials="B." surname="Vicente" fullname="Brendon Vicente Rocha Silva"><organization>ONRCPN</organization><address><postal><street></street>
 </postal><email>brendon.vicente@onrcpn.org.br</email>
-</address></author><author initials="F." surname="Schardong" fullname="Frederico Schardong"><organization>IFRS</organization><address><postal><street></street>
-</postal><email>frederico.schardong@rolante.ifrs.edu.br</email>
+</address></author><author initials="F." surname="Schardong" fullname="Frederico Schardong"><organization>UFSC</organization><address><postal><street></street>
+</postal><email>frederico.schardong@ufsc.br</email>
 </address></author><author initials="R." surname="Custódio" fullname="Ricardo Felipe Custódio"><organization>UFSC</organization><address><postal><street></street>
 </postal><email>ricardo.custodio@ufsc.br</email>
 </address></author><date/>
@@ -27,7 +27,7 @@
 </note>
 
 <note><name>Foreword</name>
-<t>The OpenID Foundation (OIDF) promotes, protects and nurtures the OpenID community and technologies. As a non-profit international standardizing body, it is comprised by over 160 participating entities (workgroup participants). The work of preparing implementer drafts and final international standards is carried out through OIDF workgroups in accordance with the OpenID Process. Participants interested in a subject for which a workgroup has been established has the right to be represented in that workgroup. International organizations, governmental and non-governmental, in liaison with OIDF, also take part in the work. OIDF collaborates closely with other standardizing bodies in the related fields.</t>
+<t>The OpenID Foundation (OIDF) promotes, protects and nurtures the OpenID community and technologies. As a non-profit international standardizing body, it is composed of over 160 participating entities (workgroup participants). The work of preparing implementer drafts and final international standards is carried out through OIDF workgroups in accordance with the OpenID Process. Participants interested in a subject for which a workgroup has been established have the right to be represented in that workgroup. International organizations, governmental and non-governmental, in liaison with OIDF, also take part in the work. OIDF collaborates closely with other standardizing bodies in the related fields.</t>
 </note>
 
 </front>
@@ -35,14 +35,14 @@
 <middle>
 
 <section anchor="introduction"><name>Introduction</name>
-<t><xref target="OpenID.Core" sectionFormat="bare" relative="#" section="OpenID Connect (OIDC)"></xref> enables Relying Parties (RPs) to obtain information about an Authentication Event performed by an OpenID Provider (OP) through a small set of standardized Claims. Among these, the Authentication Methods Reference (<tt>amr</tt>) Claim, identifies the Authentication Methods that were used to authenticate the End-User. While widely deployed, the <tt>amr</tt> Claim provides information at a coarse level of granularity and does not support the representation of method-specific properties, contextual information, or assurance-related  characteristics. Consequently, RPs are unable to express or evaluate detailed Authentication Requirements in a interoperable manner.</t>
+<t>OpenID Connect (OIDC) <xref target="OpenID.Core"></xref> enables Relying Parties (RPs) to obtain information about an Authentication Event performed by an OpenID Provider (OP) through a small set of standardized Claims. Among these, the Authentication Methods Reference (<tt>amr</tt>) Claim identifies the Authentication Methods that were used to authenticate the End-User. While widely deployed, the <tt>amr</tt> Claim provides information at a coarse level of granularity and does not support the representation of method-specific properties, contextual information, or assurance-related characteristics. Consequently, RPs are unable to express or evaluate detailed Authentication Requirements in an interoperable manner.</t>
 <t>This specification defines an extension to OpenID Connect that introduces a structured framework for representing Authentication Methods and their associated metadata. The extension further enables Clients to request the use of specific Authentication Methods and to express constraints on their characteristics using standardized protocol elements. These capabilities enable consistent interpretation of Authentication Events across heterogeneous identity systems and support the enforcement of security, assurance, and compliance requirements.</t>
 <t>The extension defined in this document is designed to be fully compatible with existing OpenID Connect flows and does not modify underlying authentication mechanisms, token formats, or authorization interactions defined by OpenID Connect. Implementations that do not support this extension continue to operate as specified by OpenID Connect, ignoring the additional elements introduced herein. Implementations that support this extension gain a standardized, machine-interpretable mechanism for representing and requesting Authentication Method information.</t>
 
 <section anchor="requirements-notation-and-conventions"><name>Requirements Notation and Conventions</name>
-<t>The key words &quot;MUST&quot;, &quot;MUST NOT&quot;, &quot;REQUIRED&quot;, &quot;SHALL&quot;, &quot;SHALL NOT&quot;, &quot;SHOULD&quot;, &quot;SHOULD NOT&quot;, &quot;RECOMMENDED&quot;, &quot;NOT RECOMMENDED&quot;, &quot;MAY&quot;, and &quot;OPTIONAL&quot; in this document are to be interpreted as described in <xref target="RFC2119" sectionFormat="bare" relative="#" section="RFC 2119"></xref>.</t>
+<t>The key words &quot;MUST&quot;, &quot;MUST NOT&quot;, &quot;REQUIRED&quot;, &quot;SHALL&quot;, &quot;SHALL NOT&quot;, &quot;SHOULD&quot;, &quot;SHOULD NOT&quot;, &quot;RECOMMENDED&quot;, &quot;NOT RECOMMENDED&quot;, &quot;MAY&quot;, and &quot;OPTIONAL&quot; in this document are to be interpreted as described in RFC 2119 <xref target="RFC2119"></xref> and RFC 8174 <xref target="RFC8174"></xref>.</t>
 <t>In the .txt version of this specification, values are quoted to indicate that they are to be taken literally. When using these values in protocol messages, the quotes MUST NOT be used as part of the value. In the HTML version of this specification, values to be taken literally are indicated by the use of this fixed-width font.</t>
-<t>All uses of <xref target="RFC7515" sectionFormat="bare" relative="#" section="JSON Web Signature (JWS)"></xref> and <xref target="RFC7516" sectionFormat="bare" relative="#" section="JSON Web Encryption (JWE)"></xref> data structures in this specification utilize the JWS Compact Serialization or the JWE Compact Serialization; the JWS JSON Serialization and the JWE JSON Serialization are not used.</t>
+<t>All uses of JSON Web Signature (JWS) <xref target="RFC7515"></xref> and JSON Web Encryption (JWE) <xref target="RFC7516"></xref> data structures in this specification utilize the JWS Compact Serialization or the JWE Compact Serialization; the JWS JSON Serialization and the JWE JSON Serialization are not used.</t>
 </section>
 
 <section anchor="scope"><name>Scope</name>
@@ -51,17 +51,20 @@
 </section>
 
 <section anchor="terminology"><name>Terminology</name>
-<t>The terminology defined in <xref target="OpenID.Core" sectionFormat="bare" relative="#" section="OpenID Connect Core 1.0"></xref>, <xref target="RFC6749" sectionFormat="bare" relative="#" section="OAuth 2.0"></xref>, and <xref target="RFC7519" sectionFormat="bare" relative="#" section="JSON Web Token (JWT)"></xref> specifications applies throughout this document. In addition, this document defines the following terms, which are used with the meanings specified herein.</t>
+<t>The terminology defined in OpenID Connect Core 1.0 <xref target="OpenID.Core"></xref>, OAuth 2.0 <xref target="RFC6749"></xref>, and JSON Web Token (JWT) <xref target="RFC7519"></xref> specifications applies throughout this document. In addition, this document defines the following terms, which are used with the meanings specified herein.</t>
 
 <dl newline="true">
 <dt><strong>Authentication Method</strong></dt>
 <dd><t>A procedure by which an End-User authenticates to the OP. Examples include password, one-time password, and biometrics.</t>
 </dd>
 <dt><strong>Authentication Method Identifier</strong></dt>
-<dd><t>A standardized identifier that references the Authentication Method typically derived from registered values, such as those defined in <xref target="RFC8176" sectionFormat="bare" relative="#" section="RFC 8176"></xref>, or from values defined by local policy.</t>
+<dd><t>A standardized identifier for an Authentication Method, typically derived from registered values, such as those defined in RFC 8176 <xref target="RFC8176"></xref>, or from values defined by local policy.</t>
+</dd>
+<dt><strong>Authentication Method Execution</strong></dt>
+<dd><t>A concrete, successful application of an Authentication Method, including the actual time at which the method was successfully performed.</t>
 </dd>
 <dt><strong>Authentication Event</strong></dt>
-<dd><t>The execution of one or more Authentication Methods resulting in the OP establishing the End-User's identity for the purposes of an OpenID Connect flow. An Authentication Event may comprise multiple Authentication Methods performed sequentially or in combination.</t>
+<dd><t>The complete set of successful Authentication Method Executions relied upon by the OP to establish the End-User's identity. An Authentication Event may comprise multiple Authentication Methods performed sequentially, in combination, or reused from an existing SSO session.</t>
 </dd>
 <dt><strong>Authentication Method Properties</strong></dt>
 <dd><t>Structured information associated with an Authentication Method employed during an Authentication Event that describes method-specific properties, configuration parameters, or security characteristics.</t>
@@ -72,8 +75,14 @@
 <dt><strong>Authentication Context</strong></dt>
 <dd><t>The aggregate set of Authentication Methods, Authentication Method Properties, and Authentication Method Metadata associated with an Authentication Event.</t>
 </dd>
+<dt><strong>Authentication Method Request Expression</strong></dt>
+<dd><t>A structured condition expressed by an RP that constrains the Authentication Methods used in an Authentication Event or their associated Authentication Method Properties and Authentication Method Metadata. Depending on the request context, the expression can represent either an Authentication Requirement or an Authentication Preference.</t>
+</dd>
 <dt><strong>Authentication Requirement</strong></dt>
-<dd><t>A condition expressed by a Client that specifies which Authentication Methods, Authentication Method Properties or Authentication Method Metadata are required for an Authentication Event to be considered acceptable. Authentication Requirements are conveyed using request structures defined by this specification.</t>
+<dd><t>An Authentication Method Request Expression that must be satisfied by an OP supporting request processing for the Authentication Request to succeed.</t>
+</dd>
+<dt><strong>Authentication Preference</strong></dt>
+<dd><t>An Authentication Method Request Expression that the OP should attempt to satisfy, but that does not prevent the Authentication Request from succeeding if it cannot be satisfied.</t>
 </dd>
 </dl>
 </section>
@@ -82,40 +91,41 @@
 <section anchor="authentication-method-representation"><name>Authentication Method Representation</name>
 <t>This section defines the framework used by an OP to represent Authentication Methods and their associated Authentication Method Properties and Authentication Method Metadata.</t>
 <t>The representation defined in this document is intended to complement, and not replace, existing OpenID Connect constructs such as the <tt>amr</tt> Claim defined in OpenID Connect Core. While the <tt>amr</tt> Claim identifies which Authentication Methods were used, it does not provide a mechanism to express method-level properties and metadata. This framework standardizes the representation of such information and enables RPs to evaluate Authentication Events based on Authentication Method Properties and Authentication Method Metadata rather than solely on method identifiers.</t>
-<t>Authentication Methods employed in an Authentication Event are represented using <strong>AMR Details Objects</strong>, each of which corresponds to a single Authentication Method executed by the OP. A complete Authentication Event is represented as a list of AMR Details Objects conveyed using a Claim named <tt>amr_details</tt>. This representation enables RPs to perform deterministic evaluation of Authentication Events, assess conformance with method-level requirements, and interpret contextual attributes relevant to assurance, compliance, and policy evaluation.</t>
+<t>Authentication Method Executions relied upon in an Authentication Event are represented using <strong>AMR Details Objects</strong>, each of which corresponds to a single successful Authentication Method Execution. A complete Authentication Event is represented as a list of AMR Details Objects conveyed using a Claim named <tt>amr_details</tt>. This representation enables RPs to perform deterministic evaluation of Authentication Events, assess conformance with method-level requirements, and interpret contextual attributes relevant to assurance, compliance, and policy evaluation.</t>
 <t>This specification explicitly separates the concept of <em>which</em> Authentication Methods were performed, as conveyed by the <tt>amr</tt> Claim, from the concept of <em>how</em> those Authentication Methods were executed, as conveyed by the <tt>amr_details</tt> Claim. This separation preserves backward compatibility with existing OpenID Connect deployments while enabling richer semantics.</t>
-<t>An OP implementing this specification <bcp14>MUST</bcp14> produce AMR Details Objects that conform to the structural and processing rules defined in this document. A RP implementing this specification <bcp14>MUST</bcp14> be capable of processing AMR Details Objects and, when applicable, evaluating them against Authentication Requirements expressed in authorization requests (see <xref target="sec-req"></xref>).</t>
+<t>An OP implementing this specification <bcp14>MUST</bcp14> produce AMR Details Objects that conform to the structural and processing rules defined in this document. An RP implementing this specification <bcp14>MUST</bcp14> be capable of processing AMR Details Objects and, when applicable, evaluating them against Authentication Requirements expressed in Authentication Requests (see <xref target="sec-req"></xref>).</t>
 
 <section anchor="amr-details-object"><name>AMR Details Object</name>
-<t>The <tt>amr_details</tt> Claim conveys the complete set of AMR Details Objects generated during an Authentication Event. The value of the <tt>amr_details</tt> Claim <bcp14>MUST</bcp14> be a JSON array, where each array element represents a single Authentication Method performed as part of the Authentication Event. Each AMR Details Object is composed of three components: an Authentication Method Identifier, Authentication Method Metadata, and Authentication Method Properties.</t>
-<t>The following non-normative example illustrates an <tt>amr_details</tt> Claim representing an Authentication Event where the End-User authenticated using a password method governed by the eIDAS trust framework. The example includes source/contextual information indicating the OP as the issuer of the Authentication Method, along with method-specific metadata such as the password hashing algorithm and policy identifier.</t>
+<t>When returned, the value of the <tt>amr_details</tt> Claim <bcp14>MUST</bcp14> be a JSON array of AMR Details Objects. Each object represents a single successful Authentication Method Execution and is composed of an Authentication Method Identifier, Authentication Method Metadata, and, when available and permitted to be disclosed, Authentication Method Properties. Distinct successful executions with the same <tt>amr_identifier</tt> <bcp14>MAY</bcp14> be represented by separate AMR Details Objects. The requirements governing the Authentication Event represented by the Claim are defined in <xref target="sec-amr-details-delivery"></xref>.</t>
+<t>The set of Authentication Method Identifiers represented by <tt>amr_details</tt> <bcp14>MUST</bcp14> be consistent with the <tt>amr</tt> Claim. Each identifier in <tt>amr_details</tt> <bcp14>MUST</bcp14> appear in <tt>amr</tt>, and each concrete Authentication Method Execution represented in <tt>amr</tt> <bcp14>MUST</bcp14> be represented by at least one AMR Details Object. Aggregate <tt>amr</tt> values that summarize the event, such as multi-factor or multi-channel indicators, need not have a separate AMR Details Object unless they correspond to a distinct Authentication Method Execution. Repeated executions <bcp14>MAY</bcp14> result in repeated AMR Details Objects; the <tt>amr</tt> Claim does not represent execution multiplicity.</t>
+<t>The following non-normative example illustrates an <tt>amr_details</tt> Claim representing an Authentication Event where the End-User authenticated using a password method governed by the eIDAS trust framework. The example includes source and contextual information identifying the entity that performed the Authentication Method, along with method-specific metadata such as the password hashing algorithm and policy identifier.</t>
 
-<sourcecode type="JSON">{
-  &quot;amr&quot;        : [ &quot;pwd&quot; ],
-  &quot;amr_details&quot;: [
+<sourcecode type="JSON"><![CDATA[{
+  "amr"        : [ "pwd" ],
+  "amr_details": [
     {
-      &quot;amr_identifier&quot;: &quot;pwd&quot;,
-      &quot;amr_metadata&quot;  : {
-        &quot;iss&quot;            : &quot;https://idp.gov.com&quot;,
-        &quot;trust_framework&quot;: &quot;eidas&quot;,
-        &quot;assurance_level&quot;: &quot;low&quot;,
-        &quot;time&quot;           : &quot;2025-09-30T18:23:41Z&quot;
+      "amr_identifier": "pwd",
+      "amr_metadata"  : {
+        "iss"            : "https://idp.gov.com",
+        "trust_framework": "eidas",
+        "assurance_level": "low",
+        "time"           : "2025-09-30T18:23:41Z"
       },
-      &quot;amr_properties&quot;: {
-        &quot;pwd_derivation_algorithm&quot;: &quot;argon2id&quot;,
-        &quot;pwd_policy_id&quot;           : &quot;govbr-password-v2&quot;
+      "amr_properties": {
+        "pwd_derivation_algorithm": "argon2id",
+        "pwd_policy_id"           : "govbr-password-v2"
       }
     }
   ]
 }
 
-</sourcecode>
+]]></sourcecode>
 <t>See <xref target="sec-auth-method-representation-examples"></xref> for additional non-normative examples of <tt>amr_details</tt> representations.</t>
 <t>The normative schema for the <tt>amr_details</tt> Claim is defined below.</t>
 
 <dl newline="true">
 <dt><tt>amr_details</tt></dt>
-<dd><t>REQUIRED. An array of JSON objects, each corresponding to an AMR Details Object. Each object is composed of the following top-level members:</t>
+<dd><t>When the <tt>amr_details</tt> Claim is returned, its value <bcp14>MUST</bcp14> be an array of JSON objects, each corresponding to an AMR Details Object. Each object is composed of the following top-level members:</t>
 </dd>
 <dt><tt>amr_identifier</tt></dt>
 <dd><t>REQUIRED. A standardized Authentication Method Identifier string referencing the Authentication Method employed. This value <bcp14>MUST</bcp14> correspond to one of the values listed in the <tt>amr</tt> Claim.</t>
@@ -127,29 +137,29 @@
 <dd><t>OPTIONAL. A JSON object containing Authentication Method Properties. The structure and content of this object are defined in <xref target="sec-method-properties"></xref>.</t>
 </dd>
 </dl>
-<t><strong>Note:</strong> Implementations shall ignore any sub-element not defined in this specification or extensions of this specification. Extensions to this specification that specify additional sub-elements under the <tt>amr_details</tt> element may be created by the OpenID Foundation, ecosystem or scheme operators or singular implementers using this specification.</t>
+<t><strong>Note:</strong> Implementations <bcp14>MUST</bcp14> ignore members not defined by this specification or by extensions to it. Extensions that define additional members of <tt>amr_details</tt> <bcp14>MAY</bcp14> be created by the OpenID Foundation, ecosystem or scheme operators, or individual implementers using this specification.</t>
 <t>Extensions of this specification, including trust framework definitions, can define further constraints on the data structure.</t>
 
 <section anchor="sec-src"><name>Authentication Method Metadata Object</name>
-<t>Each AMR Details Object <bcp14>MAY</bcp14> include exactly one Authentication Method Metadata object, conveyed using the <tt>amr_metadata</tt> member. this object contains source and contextual information about the Authentication Method execution. This information provides provenance and situational context that may be relevant for assurance evaluation, compliance checks, or policy enforcement by the RP.</t>
-<t>It is noteworthy that this specification allows the OP to report Authentication Methods executed by external authenticators or brokers. In such cases, the <tt>amr_metadata</tt> attribute indicates the issuer of the Authentication Method, which may differ from the OP itself. In these scenarios, the OP acts as the aggregator and reporter of the Authentication Context. The OP includes the relevant information of the external authenticator in the <tt>amr_metadata</tt> element and <bcp14>MAY</bcp14> perform validations on the reported data based on its own security policies or trust frameworks. Regardless of the validation level performed by the OP, the RP <bcp14>MUST</bcp14> independently evaluate whether it trusts the reported issuers (<tt>amr_metadata.iss</tt>) before granting access to sensitive resources.</t>
-<t>If present, the value of the <tt>amr_metadata</tt> member <bcp14>MUST</bcp14> be a JSON object. The following members are defined for the <tt>amr_metadata</tt> object:</t>
+<t>Each AMR Details Object <bcp14>MUST</bcp14> include exactly one Authentication Method Metadata object, conveyed using the <tt>amr_metadata</tt> member. This object contains source and contextual information about the Authentication Method Execution. This information provides provenance and situational context that may be relevant for assurance evaluation, compliance checks, or policy enforcement by the RP.</t>
+<t>This specification allows the OP to report Authentication Methods executed by external authenticators or brokers. In such cases, the <tt>amr_metadata.iss</tt> member identifies the entity that performed the Authentication Method, which may differ from the OP itself. An intermediary broker that did not perform the method <bcp14>MUST NOT</bcp14> be identified by this member solely because it conveyed the authentication information. The OP acts as the aggregator and reporter of the Authentication Context, includes the relevant information of the external authenticator in the <tt>amr_metadata</tt> member, and <bcp14>MAY</bcp14> perform validations on the reported data based on its own security policies or trust frameworks. Regardless of the validation level performed by the OP, the RP <bcp14>MUST</bcp14> independently evaluate whether it trusts the reported entities (<tt>amr_metadata.iss</tt>) before granting access to sensitive resources.</t>
+<t>The value of the <tt>amr_metadata</tt> member <bcp14>MUST</bcp14> be a JSON object. The following members are defined for the <tt>amr_metadata</tt> object:</t>
 
 <dl newline="true">
 <dt><tt>iss</tt></dt>
-<dd><t>OPTIONAL. A string identifier of the entity that performed the Authentication Method (for example, the OP itself, or an external authenticator or broker). If present, the value <bcp14>MUST</bcp14> be a case-sensitive URL containing a scheme and host, and MAY include a port number and path components. The URL <bcp14>MUST NOT</bcp14> include query or fragment components. If this member is not present, the OP indicates that it itself performed the Authentication Method.</t>
+<dd><t>OPTIONAL. A string identifier of the entity that performed the Authentication Method (for example, the OP itself, an external authenticator, or a broker that performed the method). If present, the value <bcp14>MUST</bcp14> be a case-sensitive URL containing a scheme and host, and <bcp14>MAY</bcp14> include a port number and path components. The URL <bcp14>MUST NOT</bcp14> include query or fragment components. If this member is not present, the OP indicates that it itself performed the Authentication Method.</t>
 </dd>
 <dt><tt>trust_framework</tt></dt>
-<dd><t>OPTIONAL. A string identifier referencing the trust framework under which the Authentication Method was executed. The value <bcp14>MUST</bcp14> correspond to a trust framework defined and governed by a trust framework authority, such as a regulatory body, standards organization, or federation operator, that is applicable to the transaction context. An example value is <tt>eidas</tt>, which denotes an Authentication Method executed under the European <xref target="eIDAS" sectionFormat="bare" relative="#" section="eIDAS framework"></xref>.</t>
+<dd><t>OPTIONAL. A string identifier referencing the trust framework under which the Authentication Method was executed. The value <bcp14>MUST</bcp14> correspond to a trust framework defined and governed by a trust framework authority, such as a regulatory body, standards organization, or federation operator, that is applicable to the transaction context. An example value is <tt>eidas</tt>, which denotes an Authentication Method executed under the European eIDAS framework <xref target="eIDAS"></xref>.</t>
 </dd>
 <dt><tt>assurance_level</tt></dt>
 <dd><t>OPTIONAL. A string indicating the assurance level associated with the Authentication Method execution. The value <bcp14>MUST</bcp14> correspond to an assurance level defined by the referenced trust framework, local policy, or in a recognized trust framework registry, such as the <eref target="https://www.iana.org/assignments/loa-profiles">IANA Trust Frameworks registry</eref>. Examples include <tt>eidas-loa-high</tt> and <tt>REFEDS-MFA</tt>.</t>
 </dd>
 <dt><tt>time</tt></dt>
-<dd><t>REQUIRED. A timestamp indicating when the Authentication Method was executed. The value <bcp14>MUST</bcp14> be represented in <xref target="RFC3339" sectionFormat="bare" relative="#" section="RFC 3339"></xref> format.</t>
+<dd><t>REQUIRED. A timestamp indicating when the Authentication Method was successfully performed. The value <bcp14>MUST</bcp14> be represented in RFC 3339 <xref target="RFC3339"></xref> format. The OP <bcp14>MUST</bcp14> capture and preserve the actual execution time. The OP <bcp14>MUST NOT</bcp14> substitute token issuance time, authorization request time, session creation time, serialization time, or another approximate timestamp.</t>
 </dd>
 <dt><tt>location</tt></dt>
-<dd><t>OPTIONAL. A JSON object providing contextual information about the geographic or network origin of the authentication. Location-related data is considered sensitive and <bcp14>SHOULD</bcp14> be conveyed only when explicitly requested by the RP or required by an applicable policy or trust framework. While this specification enables the representation of high-precision information, OPs <bcp14>SHOULD</bcp14> apply data minimization practices where possible, such as truncating IP addresses or reducing the precision of geospatial coordinates. In certain high-assurance use cases, including regulated financial transaction environments, precise origin information <bcp14>MAY</bcp14> be required in order to satisfy security or compliance requirements. This object <bcp14>MAY</bcp14> include the standard <tt>address</tt> elements defined in <eref target="https://openid.net/specs/openid-connect-core-1_0.html#AddressClaim">Section 5.1.1</eref> of <xref target="OpenID.Core" sectionFormat="bare" relative="#" section="OIDC Core"></xref>, and <bcp14>MAY</bcp14> additionally include network-related and geospatial attributes, as defined by this specification.</t>
+<dd><t>OPTIONAL. A JSON object providing contextual information about the geographic or network origin of the authentication. Location-related data is considered sensitive and <bcp14>SHOULD</bcp14> be conveyed only when explicitly requested by the RP or required by an applicable policy or trust framework. While this specification enables the representation of high-precision information, OPs <bcp14>SHOULD</bcp14> apply data minimization practices where possible, such as truncating IP addresses or reducing the precision of geospatial coordinates. In certain high-assurance use cases, including regulated financial transaction environments, precise origin information <bcp14>MAY</bcp14> be required in order to satisfy security or compliance requirements. This object <bcp14>MAY</bcp14> include the standard <tt>address</tt> elements defined in <eref target="https://openid.net/specs/openid-connect-core-1_0.html#AddressClaim">Section 5.1.1</eref> of OIDC Core <xref target="OpenID.Core"></xref>, and <bcp14>MAY</bcp14> additionally include network-related and geospatial attributes, as defined by this specification.</t>
 
 <dl newline="true">
 <dt><tt>ip_address</tt></dt>
@@ -176,6 +186,8 @@
 <ul>
 <li><t>Each member of <tt>amr_properties</tt> <bcp14>MUST</bcp14> be a JSON value whose type is consistent with the definitions in this section (string, number, boolean, object, or array). Time-related values <bcp14>SHOULD</bcp14> use the same formatting requirements as <tt>amr_metadata.time</tt> (see <xref target="sec-src"></xref>).</t>
 </li>
+<li><t>A property designated as REQUIRED by an Authentication Method Properties profile is required only when the <tt>amr_properties</tt> object is emitted for that method. If the OP cannot truthfully provide every unconditionally REQUIRED property for the applicable profile, it <bcp14>MUST</bcp14> omit the entire <tt>amr_properties</tt> object rather than emit incomplete, inferred, or fabricated data. A property whose applicability depends on the manner in which the method was executed <bcp14>MUST</bcp14> state that condition explicitly. Trust frameworks or profiles <bcp14>MAY</bcp14> define stricter requirements.</t>
+</li>
 <li><t>The set of members that <bcp14>MAY</bcp14> appear within <tt>amr_properties</tt> is bound to the value of <tt>amr_identifier</tt>. An OP <bcp14>MUST NOT</bcp14> emit Authentication Method Properties that are unrelated to the referenced Authentication Method.</t>
 </li>
 <li><t>An OP <bcp14>MUST NOT</bcp14> include secrets, raw authenticators, replayable artifacts, or values that would enable offline attacks or impersonation. Prohibited content includes, but is not limited to, password hashes or salts, OTP values or seeds, biometric templates, private keys, or full device identifiers that are stable and enable cross-context correlation. When disclosure is necessary for auditability, the OP <bcp14>SHOULD</bcp14> prefer policy identifiers, coarse configuration descriptors, or non-sensitive measurements.</t>
@@ -198,7 +210,7 @@
 <dd><t>Extensions <bcp14>MUST</bcp14> be designed to disclose no more Authentication Method Properties than are necessary for the intended evaluation, in accordance with privacy-by-design principles and applicable deployment policies.</t>
 </dd>
 <dt><strong>Discovery Alignment</strong></dt>
-<dd><t>When <xref target="OpenID.Discovery" sectionFormat="bare" relative="#" section="OpenID Connect Discovery"></xref> is used, OPs <bcp14>SHOULD</bcp14> advertise supported Authentication Method Properties using the capability advertisement mechanisms defined by this specification (see <xref target="sec-op-metadata"></xref>), enabling RPs to determine which properties may be conveyed for a given <tt>amr_identifier</tt>.</t>
+<dd><t>When OpenID Connect Discovery <xref target="OpenID.Discovery"></xref> is used, OPs <bcp14>SHOULD</bcp14> advertise supported Authentication Method Properties using the capability advertisement mechanisms defined by this specification (see <xref target="sec-op-metadata"></xref>), enabling RPs to determine which properties may be conveyed for a given <tt>amr_identifier</tt>.</t>
 </dd>
 </dl>
 </section>
@@ -206,7 +218,7 @@
 </section>
 
 <section anchor="sec-method-properties-profiles"><name>Authentication Method Properties Profiles</name>
-<t>This section defines baseline vocabularies for method-specific <tt>amr_properties</tt>. The set of Authentication Methods addressed by this specification is derived from commonly deployed methods as described in <xref target="RFC8176" sectionFormat="bare" relative="#" section="RFC 8176"></xref>. Not all Authentication Methods defined therein are associated with a distinct profile in this section.</t>
+<t>This section defines baseline vocabularies for method-specific <tt>amr_properties</tt>. The set of Authentication Methods addressed by this specification is derived from commonly deployed methods as described in RFC 8176 <xref target="RFC8176"></xref>. Not all Authentication Methods defined therein are associated with a distinct profile in this section.</t>
 <t>Where multiple identifiers represent Authentication Methods with substantially overlapping functionality or semantics, this specification defines a profile for a representative identifier only. For example, while both <tt>hwk</tt> and <tt>sc</tt> denote hardware-based key mechanisms, a profile is defined for <tt>hwk</tt>, and the same profile <bcp14>MAY</bcp14> be applied to <tt>sc</tt> or equivalent identifiers by trust frameworks or deployments. Additionally, methods such as <tt>mfa</tt> or <tt>mca</tt> are intentionally omitted as they represent multi-factor or multi-channel constructs rather than standalone methods.</t>
 <t>Each profile defined below applies when the value of <tt>amr_identifier</tt> equals the corresponding identifier. The profiles defined in this section are non-exhaustive and <bcp14>MAY</bcp14> be extended by trust frameworks or deployments as needed (see <xref target="sec-method-properties-extensibility"></xref>).</t>
 
@@ -349,12 +361,17 @@
 </dl>
 </section>
 
+<section anchor="webauthn-and-passkeys-pop"><name>WebAuthn and Passkeys (<tt>pop</tt>)</name>
+<t>A successfully verified WebAuthn assertion <bcp14>MAY</bcp14> be represented using the <tt>pop</tt> Authentication Method Identifier. The OP <bcp14>MUST NOT</bcp14> represent a WebAuthn assertion as <tt>hwk</tt> or <tt>swk</tt> unless it possesses trustworthy evidence supporting the corresponding key-protection classification. Backup eligibility, backup state, authenticator attachment, or an unattested AAGUID are insufficient by themselves. A non-backup-eligible credential does not by itself prove hardware protection, and software protection <bcp14>MUST NOT</bcp14> be inferred merely because hardware protection was not proven.</t>
+<t>WebAuthn credential identifiers, public keys, attestation material, and AAGUIDs <bcp14>SHOULD</bcp14> be omitted unless necessary and permitted by applicable disclosure policy. Any disclosed credential reference <bcp14>MUST</bcp14> follow the pairwise and opacity requirements defined for key identifiers in the <tt>hwk</tt> and <tt>swk</tt> profiles.</t>
+</section>
+
 <section anchor="hardware-secured-key-proof-of-possession-hwk"><name>Hardware Secured Key Proof-of-Possession (<tt>hwk</tt>)</name>
 <t>Hardware Secured Key Proof-of-Possession methods involve the use of cryptographic keys stored in secure hardware modules, such as Hardware Security Modules (HSMs), Trusted Platform Modules (TPMs), embedded Secure Elements, and other tamper-resistant cryptographic processors that ensure private keys remain within hardware boundaries. When <tt>amr_identifier</tt> is <tt>hwk</tt>, the <tt>amr_properties</tt> object <bcp14>MAY</bcp14> contain:</t>
 
 <dl newline="true">
 <dt><tt>hwk_key_id</tt></dt>
-<dd><t>REQUIRED. A string identifier representing the specific hardware key used during the Authentication Event. This identifier <bcp14>MUST</bcp14> be unique within the context of the OP and <bcp14>SHOULD</bcp14> be stable across Authentication Events to facilitate key management and auditing.</t>
+<dd><t>OPTIONAL. An opaque identifier representing the hardware key used during the Authentication Event. This member <bcp14>SHOULD</bcp14> be omitted unless it is necessary for the RP's stated purpose. When disclosed, it <bcp14>MUST NOT</bcp14> contain the raw credential identifier, public key, or a globally stable internal identifier, and <bcp14>MUST</bcp14> be pairwise with respect to the RP or sector identifier.</t>
 </dd>
 <dt><tt>hwk_key_type</tt></dt>
 <dd><t>REQUIRED. A string indicating the type of cryptographic key used. Acceptable values include (non-exhaustive):</t>
@@ -393,7 +410,7 @@
 </li>
 </ul></dd>
 <dt><tt>hwk_aaguid</tt></dt>
-<dd><t>OPTIONAL. The Authenticator Attestation Globally Unique Identifier (AAGUID), as defined in FIDO specifications, if applicable. When present, this value <bcp14>MUST</bcp14> be represented as a lowercase hexadecimal string formatted in the standard 8-4-4-4-12 pattern (e.g., <tt>123e4567-e89b-12d3-a456-426614174000</tt>).</t>
+<dd><t>OPTIONAL. The Authenticator Attestation Globally Unique Identifier (AAGUID), as defined in FIDO specifications, if applicable. When present, this value <bcp14>MUST</bcp14> be represented as a lowercase hexadecimal string formatted in the standard 8-4-4-4-12 pattern (e.g., <tt>123e4567-e89b-12d3-a456-426614174000</tt>). An AAGUID <bcp14>MUST NOT</bcp14> be treated as trustworthy evidence of hardware protection unless it is supported by verified attestation and an applicable trust source.</t>
 </dd>
 <dt><tt>hwk_fips_compliance</tt></dt>
 <dd><t>OPTIONAL. A string indicating the FIPS (Federal Information Processing Standards) compliance level of the hardware key or its containing module. Acceptable values include (non-exhaustive):</t>
@@ -420,10 +437,10 @@
 <dd><t>OPTIONAL. A string representing the serial number of the X.509 certificate associated with the hardware key, if applicable.</t>
 </dd>
 <dt><tt>hwk_cert_valid_from</tt></dt>
-<dd><t>OPTIONAL. A timestamp indicating the start of the validity period of the X.509 certificate associated with the hardware key, if applicable. The value <bcp14>MUST</bcp14> be represented in <xref target="RFC3339" sectionFormat="bare" relative="#" section="RFC 3339"></xref> format.</t>
+<dd><t>OPTIONAL. A timestamp indicating the start of the validity period of the X.509 certificate associated with the hardware key, if applicable. The value <bcp14>MUST</bcp14> be represented in RFC 3339 <xref target="RFC3339"></xref> format.</t>
 </dd>
 <dt><tt>hwk_cert_valid_to</tt></dt>
-<dd><t>OPTIONAL. A timestamp indicating the end of the validity period of the X.509 certificate associated with the hardware key, if applicable. The value <bcp14>MUST</bcp14> be represented in <xref target="RFC3339" sectionFormat="bare" relative="#" section="RFC 3339"></xref> format.</t>
+<dd><t>OPTIONAL. A timestamp indicating the end of the validity period of the X.509 certificate associated with the hardware key, if applicable. The value <bcp14>MUST</bcp14> be represented in RFC 3339 <xref target="RFC3339"></xref> format.</t>
 </dd>
 <dt><tt>hwk_policy_id</tt></dt>
 <dd><t>OPTIONAL. A string identifier referencing the hardware key policy under which the key was created or is governed. The value <bcp14>MUST</bcp14> correspond to a policy registered in a recognized policy registry or defined by local policy.</t>
@@ -506,10 +523,10 @@
 <dd><t>OPTIONAL. A number indicating the maximum number of attempts allowed for answering the knowledge-based questions during the Authentication Event. This value <bcp14>MUST</bcp14> be a positive integer.</t>
 </dd>
 <dt><tt>kba_last_updated_at</tt></dt>
-<dd><t>OPTIONAL. A timestamp indicating when the knowledge-based questions were last updated or reviewed for accuracy and relevance. The value <bcp14>MUST</bcp14> be represented in <xref target="RFC3339" sectionFormat="bare" relative="#" section="RFC 3339"></xref> format.</t>
+<dd><t>OPTIONAL. A timestamp indicating when the knowledge-based questions were last updated or reviewed for accuracy and relevance. The value <bcp14>MUST</bcp14> be represented in RFC 3339 <xref target="RFC3339"></xref> format.</t>
 </dd>
 <dt><tt>kba_created_at</tt></dt>
-<dd><t>OPTIONAL. A timestamp indicating when the knowledge-based questions were initially created or registered. The value <bcp14>MUST</bcp14> be represented in <xref target="RFC3339" sectionFormat="bare" relative="#" section="RFC 3339"></xref> format.</t>
+<dd><t>OPTIONAL. A timestamp indicating when the knowledge-based questions were initially created or registered. The value <bcp14>MUST</bcp14> be represented in RFC 3339 <xref target="RFC3339"></xref> format.</t>
 </dd>
 <dt><tt>kba_policy_id</tt></dt>
 <dd><t>OPTIONAL. A string identifier referencing the KBA policy under which the questions were created or are governed. The value <bcp14>MUST</bcp14> correspond to a policy registered in a recognized policy registry or defined by local policy.</t>
@@ -528,9 +545,9 @@
 <dd><t>REQUIRED. A string indicating the OTP generation algorithm used. Acceptable values include (non-exhaustive):</t>
 
 <ul>
-<li><t><tt>TOTP</tt>: Time-based One-Time Password, as defined in <xref target="RFC6238" sectionFormat="bare" relative="#" section="RFC 6238"></xref>.</t>
+<li><t><tt>TOTP</tt>: Time-based One-Time Password, as defined in RFC 6238 <xref target="RFC6238"></xref>.</t>
 </li>
-<li><t><tt>HOTP</tt>: HMAC-based One-Time Password, as defined in <xref target="RFC4226" sectionFormat="bare" relative="#" section="RFC 4226"></xref>.</t>
+<li><t><tt>HOTP</tt>: HMAC-based One-Time Password, as defined in RFC 4226 <xref target="RFC4226"></xref>.</t>
 </li>
 </ul></dd>
 <dt><tt>otp_format</tt></dt>
@@ -563,7 +580,7 @@
 <dd><t>OPTIONAL. Integer value representing the duration, in seconds, during which the OTP remains valid. For TOTP, this corresponds to the time-step size; for HOTP, this represents the acceptable counter window defined by the verifier. It <bcp14>MUST</bcp14> be a positive integer.</t>
 </dd>
 <dt><tt>otp_delivery_time</tt></dt>
-<dd><t>OPTIONAL. A timestamp indicating when the OTP was delivered to the End-User. The value <bcp14>MUST</bcp14> be represented in <xref target="RFC3339" sectionFormat="bare" relative="#" section="RFC 3339"></xref> format. This attribute <bcp14>MUST</bcp14> only be used if the OTP was delivered through an out-of-band channel.</t>
+<dd><t>OPTIONAL. A timestamp indicating when the OTP was delivered to the End-User. The value <bcp14>MUST</bcp14> be represented in RFC 3339 <xref target="RFC3339"></xref> format. This attribute <bcp14>MUST</bcp14> only be used if the OTP was delivered through an out-of-band channel.</t>
 </dd>
 <dt><tt>otp_max_attempts</tt></dt>
 <dd><t>OPTIONAL. A number indicating the maximum number of attempts allowed for entering the OTP during the Authentication Event. This value <bcp14>MUST</bcp14> be a positive integer.</t>
@@ -604,10 +621,10 @@
 <dd><t>OPTIONAL. A number indicating the actual number of attempts made by the End-User to enter the PIN during the Authentication Event. This value <bcp14>MUST</bcp14> be a positive integer.</t>
 </dd>
 <dt><tt>pin_last_updated_at</tt></dt>
-<dd><t>OPTIONAL. A timestamp indicating when the PIN was last set or updated. The value <bcp14>MUST</bcp14> be represented in <xref target="RFC3339" sectionFormat="bare" relative="#" section="RFC 3339"></xref> format.</t>
+<dd><t>OPTIONAL. A timestamp indicating when the PIN was last set or updated. The value <bcp14>MUST</bcp14> be represented in RFC 3339 <xref target="RFC3339"></xref> format.</t>
 </dd>
 <dt><tt>pin_created_at</tt></dt>
-<dd><t>OPTIONAL. A timestamp indicating when the PIN was initially created. The value <bcp14>MUST</bcp14> be represented in <xref target="RFC3339" sectionFormat="bare" relative="#" section="RFC 3339"></xref> format.</t>
+<dd><t>OPTIONAL. A timestamp indicating when the PIN was initially created. The value <bcp14>MUST</bcp14> be represented in RFC 3339 <xref target="RFC3339"></xref> format.</t>
 </dd>
 <dt><tt>pin_policy_id</tt></dt>
 <dd><t>OPTIONAL. A string identifier referencing the PIN policy under which the PIN was created or is governed. The value <bcp14>MUST</bcp14> correspond to a policy registered in a recognized policy registry or defined by local policy.</t>
@@ -619,13 +636,13 @@
 <t>Password metadata is primarily intended to support auditability and assurance evaluation (<em>e.g.</em>, algorithm family and governing policy), without exposing sensitive password material. When <tt>amr_identifier</tt> is <tt>pwd</tt>, the <tt>amr_properties</tt> object <bcp14>MAY</bcp14> contain:</t>
 
 <dl newline="true">
-<dt><tt>pwd_derivation_algorithmrithm</tt></dt>
-<dd><t>REQUIRED. A string indicating the password hashing or derivation algorithm used to store or verify the password. The value must correspond to a standardized password-based key derivation or hash function defined in relevant specifications. Acceptable may values include (non-exhaustive):</t>
+<dt><tt>pwd_derivation_algorithm</tt></dt>
+<dd><t>REQUIRED. A string indicating the password hashing or derivation algorithm used to store or verify the password. The value <bcp14>MUST</bcp14> correspond to a standardized password-based key derivation or hash function defined in relevant specifications. Acceptable values include (non-exhaustive):</t>
 
 <ul spacing="compact">
-<li><tt>pbkdf2</tt>, defined in <xref target="RFC8018" sectionFormat="bare" relative="#" section="RFC 8018"></xref>;</li>
-<li><tt>scrypt</tt>, defined in <xref target="RFC7914" sectionFormat="bare" relative="#" section="RFC 7914"></xref>;</li>
-<li><tt>argon2id</tt>, defined in <xref target="RFC9106" sectionFormat="bare" relative="#" section="RFC 9106"></xref>;</li>
+<li><tt>pbkdf2</tt>, defined in RFC 8018 <xref target="RFC8018"></xref>;</li>
+<li><tt>scrypt</tt>, defined in RFC 7914 <xref target="RFC7914"></xref>;</li>
+<li><tt>argon2id</tt>, defined in RFC 9106 <xref target="RFC9106"></xref>;</li>
 <li><tt>sha256</tt> or <tt>sha512</tt>, if a raw cryptographic hash is used, as registered in the <eref target="https://www.iana.org/assignments/named-information">IANA Named Information Hash Algorithm registry</eref>.</li>
 </ul></dd>
 <dt><tt>pwd_iterations</tt></dt>
@@ -635,10 +652,10 @@
 <dd><t>OPTIONAL. A number indicating the length, in bytes, of the salt used in the password hashing or derivation process. This value <bcp14>MUST</bcp14> be a positive integer.</t>
 </dd>
 <dt><tt>pwd_last_updated_at</tt></dt>
-<dd><t>OPTIONAL. A timestamp indicating when the password was last set or updated. The value <bcp14>MUST</bcp14> be represented in <xref target="RFC3339" sectionFormat="bare" relative="#" section="RFC 3339"></xref> format.</t>
+<dd><t>OPTIONAL. A timestamp indicating when the password was last set or updated. The value <bcp14>MUST</bcp14> be represented in RFC 3339 <xref target="RFC3339"></xref> format.</t>
 </dd>
 <dt><tt>pwd_created_at</tt></dt>
-<dd><t>OPTIONAL. A timestamp indicating when the password was initially created. The value <bcp14>MUST</bcp14> be represented in <xref target="RFC3339" sectionFormat="bare" relative="#" section="RFC 3339"></xref> format.</t>
+<dd><t>OPTIONAL. A timestamp indicating when the password was initially created. The value <bcp14>MUST</bcp14> be represented in RFC 3339 <xref target="RFC3339"></xref> format.</t>
 </dd>
 <dt><tt>pwd_policy_id</tt></dt>
 <dd><t>OPTIONAL. A string identifier referencing the password policy under which the password was created or is governed. The value <bcp14>MUST</bcp14> correspond to a policy registered in a recognized policy registry or defined by local policy.</t>
@@ -707,7 +724,7 @@
 </li>
 </ul></dd>
 <dt><tt>sms_delivery_time</tt></dt>
-<dd><t>OPTIONAL. A timestamp indicating when the SMS message containing the authentication code was sent to the End-User. The value <bcp14>MUST</bcp14> be represented in <xref target="RFC3339" sectionFormat="bare" relative="#" section="RFC 3339"></xref> format.</t>
+<dd><t>OPTIONAL. A timestamp indicating when the SMS message containing the authentication code was sent to the End-User. The value <bcp14>MUST</bcp14> be represented in RFC 3339 <xref target="RFC3339"></xref> format.</t>
 </dd>
 <dt><tt>sms_origin</tt></dt>
 <dd><t>OPTIONAL. A string value identifying the sender identity used for SMS transmission, allowing for origin validation. Values <bcp14>MAY</bcp14> include:</t>
@@ -743,7 +760,7 @@
 
 <dl newline="true">
 <dt><tt>swk_key_id</tt></dt>
-<dd><t>REQUIRED. A string identifier representing the specific software key used during the Authentication Event. This identifier <bcp14>MUST</bcp14> be unique within the context of the OP and <bcp14>SHOULD</bcp14> be stable across Authentication Events to facilitate key management and auditing.</t>
+<dd><t>OPTIONAL. An opaque identifier representing the software key used during the Authentication Event. This member <bcp14>SHOULD</bcp14> be omitted unless it is necessary for the RP's stated purpose. When disclosed, it <bcp14>MUST NOT</bcp14> contain the raw credential identifier, public key, or a globally stable internal identifier, and <bcp14>MUST</bcp14> be pairwise with respect to the RP or sector identifier.</t>
 </dd>
 <dt><tt>swk_key_type</tt></dt>
 <dd><t>REQUIRED. A string indicating the type of cryptographic key used. Acceptable values include (non-exhaustive):</t>
@@ -817,10 +834,10 @@
 <dd><t>OPTIONAL. A string representing the serial number of the X.509 certificate associated with the software key, if applicable.</t>
 </dd>
 <dt><tt>swk_cert_valid_from</tt></dt>
-<dd><t>OPTIONAL. A timestamp indicating the start of the validity period of the X.509 certificate associated with the software key, if applicable. The value <bcp14>MUST</bcp14> be represented in <xref target="RFC3339" sectionFormat="bare" relative="#" section="RFC 3339"></xref> format.</t>
+<dd><t>OPTIONAL. A timestamp indicating the start of the validity period of the X.509 certificate associated with the software key, if applicable. The value <bcp14>MUST</bcp14> be represented in RFC 3339 <xref target="RFC3339"></xref> format.</t>
 </dd>
 <dt><tt>swk_cert_valid_to</tt></dt>
-<dd><t>OPTIONAL. A timestamp indicating the end of the validity period of the X.509 certificate associated with the software key, if applicable. The value <bcp14>MUST</bcp14> be represented in <xref target="RFC3339" sectionFormat="bare" relative="#" section="RFC 3339"></xref> format.</t>
+<dd><t>OPTIONAL. A timestamp indicating the end of the validity period of the X.509 certificate associated with the software key, if applicable. The value <bcp14>MUST</bcp14> be represented in RFC 3339 <xref target="RFC3339"></xref> format.</t>
 </dd>
 <dt><tt>swk_policy_id</tt></dt>
 <dd><t>OPTIONAL. A string identifier referencing the software key policy under which the key was created or is governed. The value <bcp14>MUST</bcp14> correspond to a policy registered in a recognized policy registry or defined by local policy.</t>
@@ -855,7 +872,7 @@
 </li>
 </ul></dd>
 <dt><tt>tel_call_time</tt></dt>
-<dd><t>OPTIONAL. A timestamp indicating when the telephone call for authentication was initiated or received. The value <bcp14>MUST</bcp14> be represented in <xref target="RFC3339" sectionFormat="bare" relative="#" section="RFC 3339"></xref> format.</t>
+<dd><t>OPTIONAL. A timestamp indicating when the telephone call for authentication was initiated or received. The value <bcp14>MUST</bcp14> be represented in RFC 3339 <xref target="RFC3339"></xref> format.</t>
 </dd>
 <dt><tt>tel_call_duration</tt></dt>
 <dd><t>OPTIONAL. A number indicating the duration of the telephone call used for authentication, measured in seconds. This value <bcp14>MUST</bcp14> be a positive integer.</t>
@@ -977,94 +994,11 @@
 </dl>
 </section>
 </section>
-
-<section anchor="amr-details-delivery"><name><tt>amr_details</tt> Delivery</name>
-<t>This section defines the rules governing <em>when</em> and <em>how</em> the <tt>amr_details</tt> Claim is returned by the OP.</t>
-<t>The delivery of the <tt>amr_details</tt> Claim follows the general OIDC principles for Claims issuance defined in <eref target="https://openid.net/specs/openid-connect-core-1_0.html#Claims">Section 5</eref> of <xref target="OpenID.Core" sectionFormat="bare" relative="#" section="OIDC Core"></xref>, allowing OPs to apply internal policies, trust frameworks, and regulatory requirements while ensuring deterministic behavior when the Claim is explicitly requested by the RP.</t>
-
-<section anchor="conditions-for-delivery-of-the-amr-details-claim"><name>Conditions for Delivery of the <tt>amr_details</tt> Claim</name>
-<t>An OP is not required to return the <tt>amr_details</tt> Claim unless it is explicitly requested by the RP.</t>
-<t>When requested, the OP <bcp14>MUST</bcp14> evaluate the request according to its declared capabilities and the processing rules defined in this specification (see <xref target="sec-processing-requirements"></xref>).</t>
-<t>Notwithstanding the above, an OP <bcp14>MAY</bcp14> return the <tt>amr_details</tt> Claim without an explicit request from the RP, based on internal policies, trust frameworks, regulatory obligations, or default Claim issuance rules. The determination of such policies is outside the scope of this specification.</t>
-</section>
-
-<section anchor="delivery-mechanisms"><name>Delivery Mechanisms</name>
-<t>When a RP explicitly requests the <tt>amr_details</tt> Claim, the OP <bcp14>MUST</bcp14> return the Claim in the location(s) specified in the request, such as within the ID Token or via the UserInfo Endpoint, as defined by <xref target="OpenID.Core" sectionFormat="bare" relative="#" section="OIDC Core"></xref>. If the OP is unable to populate the <tt>amr_details</tt> Claim for a given Authentication Event, due to lack of available information, policy restrictions, or other operational limitations, the OP <bcp14>MAY</bcp14> omit the claim. However, it <bcp14>SHOULD</bcp14> try to provide at least partial information whenever possible.</t>
-<t>If the RP does not explicitly request the <tt>amr_details</tt> Claim and the OP elects to return it based on internal policy, the OP <bcp14>MAY</bcp14> choose the delivery location.</t>
-<t>The content of the <tt>amr_details</tt> Claim returned via different delivery mechanisms <bcp14>MUST</bcp14> be semantically equivalent.</t>
-</section>
-
-<section anchor="privacy-considerations-for-claim-delivery"><name>Privacy Considerations for Claim Delivery</name>
-<t>Given that the <tt>amr_details</tt> Claim may reveal sensitive information about the Authentication Context, OPs and RPs are encouraged to apply data minimization principles when requesting or returning this Claim.</t>
-<t>RPs <bcp14>SHOULD</bcp14> request <tt>amr_details</tt> only when strictly necessary for their security or compliance requirements. OPs <bcp14>SHOULD</bcp14> avoid returning <tt>amr_details</tt> by default unless required by policy or trust framework obligations.</t>
-<t>Below is an example of an ID Token payload including the <tt>amr_details</tt> Claim:</t>
-
-<sourcecode type="json">{
-  &quot;iss&quot;        : &quot;https://server.example.com&quot;,
-  &quot;sub&quot;        : &quot;248289761&quot;,
-  &quot;aud&quot;        : &quot;https://rs.example.com/&quot;,
-  &quot;exp&quot;        : 1544645174,
-  &quot;client_id&quot;  : &quot;client&quot;,
-  &quot;amr&quot;        : [ &quot;pwd&quot;, &quot;otp&quot; ],
-  &quot;amr_details&quot;: [
-    {
-      &quot;amr_identifier&quot;: &quot;pwd&quot;,
-      &quot;amr_metadata&quot;  : {
-        &quot;iss&quot;            : &quot;https://idp.gov.com&quot;,
-        &quot;trust_framework&quot;: &quot;eidas&quot;,
-        &quot;assurance_level&quot;: &quot;low&quot;,
-        &quot;time&quot;           : &quot;2025-09-30T18:23:41Z&quot;
-      },
-      &quot;amr_properties&quot;: {
-        &quot;pwd_derivation_algorithm&quot;: &quot;argon2id&quot;,
-        &quot;pwd_policy_id&quot;           : &quot;govbr-password-v2&quot;
-      }
-    },
-    {
-      &quot;amr_identifier&quot;: &quot;otp&quot;,
-      &quot;amr_metadata&quot;  : {
-        &quot;iss&quot;            : &quot;https://broker.example.org&quot;,
-        &quot;trust_framework&quot;: &quot;eidas&quot;,
-        &quot;assurance_level&quot;: &quot;substantial&quot;,
-        &quot;time&quot;           : &quot;2025-09-30T18:23:55Z&quot;
-      },
-      &quot;amr_properties&quot;: {
-        &quot;otp_algorithm&quot;   : &quot;TOTP&quot;,
-        &quot;otp_length&quot;      : 6,
-        &quot;otp_time_to_live&quot;: 60
-      }
-    }
-  ]
-}
-</sourcecode>
-</section>
-</section>
 </section>
 
 <section anchor="sec-req"><name>Requesting Authentication Methods</name>
-<t>Authentication Methods and their properties are requested during the authentication process using the <tt>amr_details</tt> Claim within the <tt>claims</tt> parameter, as defined in <eref target="https://openid.net/specs/openid-connect-core-1_0.html#ClaimsParameter">Section 5.5</eref> of <xref target="OpenID.Core" sectionFormat="bare" relative="#" section="OIDC Core"></xref>. This mechanism allows RPs to express their assurance requirements and policy constraints in a standardized manner, granting them greater control over the Authentication Event. Clients can specify not only <em>which</em> Authentication Methods are required but also <em>how</em> those methods should be executed.</t>
-<t>Unlike the representation of Authentication Methods used in the authentication response (which is a JSON Array), the <tt>amr_details</tt> Claim within the authentication request <bcp14>MUST</bcp14> be a JSON Object. This object serves as a logical template or filter that the OP <bcp14>MUST</bcp14> satisfy to issue the token.</t>
-<t>Within the <tt>amr_details</tt> expression object, the RP <bcp14>MAY</bcp14>:</t>
-
-<ul spacing="compact">
-<li>Request the presence of specific attributes by using <tt>null</tt> values;</li>
-<li>Express value constraints using the <tt>value</tt> and <tt>essential</tt> operators;</li>
-<li>Group requirements using logical operators <tt>all_of</tt> and <tt>one_of</tt>.</li>
-</ul>
-<t>A non-normative example of negotiating Authentication Methods and attributes using the <tt>claims</tt> parameter is provided below:</t>
-
-<sourcecode type="json">{
-  &quot;id_token&quot;: {
-    &quot;amr_details&quot;: {
-      &quot;amr_identifier&quot;: { &quot;value&quot;: &quot;pwd&quot;, &quot;location&quot;: null },
-      &quot;amr_properties&quot;: {
-        &quot;pwd_derivation_algorithm&quot;: null,
-        &quot;pwd_policy_id&quot;           : null
-      }
-    }
-  }
-}
-</sourcecode>
+<t>Authentication Methods and their properties are requested during the authentication process using the <tt>amr_details</tt> Claim within the <tt>claims</tt> parameter, as defined in <eref target="https://openid.net/specs/openid-connect-core-1_0.html#ClaimsParameter">Section 5.5</eref> of OIDC Core <xref target="OpenID.Core"></xref>. This mechanism allows RPs to express assurance requirements and policy constraints in a standardized manner. RPs can specify not only <em>which</em> Authentication Methods they prefer or require, but also constraints on <em>how</em> those methods are performed.</t>
+<t>Unlike the representation of Authentication Methods in a response, whose value is a JSON array, an individual <tt>amr_details</tt> Claim request <bcp14>MUST</bcp14> be either <tt>null</tt> or a JSON object. A <tt>null</tt> request asks the OP to voluntarily return the complete Claim without prescribing Authentication Methods. A JSON object is an outer Claim Request Object: it <bcp14>MAY</bcp14> contain the top-level <tt>essential</tt> member and <bcp14>MAY</bcp14> contain exactly one Authentication Method Request Expression. An object that contains only <tt>essential</tt>, or neither <tt>essential</tt> nor an expression, is an unconstrained request. The syntax and semantics of Claim requests and expressions are defined below.</t>
 <t>Besides including the <tt>amr_details</tt> Claim within the <tt>claims</tt> parameter in authentication requests, this specification does not define any other means for requesting Authentication Methods. However, some deployments <bcp14>MAY</bcp14> choose to negotiate or request Authentication Methods through scope values (<em>e.g.</em>, <tt>scope=pwd+otp</tt>) provided there is prior agreement between the RP and the OP regarding the semantics of such scopes. Such approaches are possible under OIDC Core but fall outside the normative scope of this specification.</t>
 
 <section anchor="operators-and-constraints"><name>Operators and Constraints</name>
@@ -1072,46 +1006,46 @@
 
 <dl newline="true">
 <dt><tt>one_of</tt> and <tt>all_of</tt></dt>
-<dd><t>Logical operators for combining multiple Authentication Methods or attributes within a single request element. By using these operators, RPs can request combinations of methods and attributes with specific logical relationships: for example, requiring at least one method from a set (<tt>one_of</tt>) or mandating that all specified methods be used (<tt>all_of</tt>). These operators <bcp14>MUST</bcp14> only be used to group JSON objects rather than primitive values. If RPs need to express logical combinations of primitive values, they <bcp14>MUST</bcp14> use the <tt>one_of</tt> and <tt>all_of</tt> operators at the parent object level and make use of the <tt>value</tt> attribute within each grouped object. For example, to request either <tt>TOTP</tt> or <tt>HOTP</tt> as the OTP algorithm, the following structure would be used:</t>
+<dd><t>Logical operators for combining Authentication Method Request Expressions. An <tt>all_of</tt> expression matches when every child expression matches. A <tt>one_of</tt> expression matches when at least one child expression matches; it does not require exactly one matching child. Their values <bcp14>MUST</bcp14> be non-empty JSON arrays whose elements are Authentication Method Request Expressions. Expressions <bcp14>MAY</bcp14> be nested recursively. The same Authentication Method Execution <bcp14>MAY</bcp14> satisfy more than one child expression, including children of the same <tt>all_of</tt> expression; this specification does not define an operator that requires distinct executions. Failure of one <tt>one_of</tt> branch does not prevent another branch from satisfying the expression, and attempting a branch does not commit the OP to that branch. Array order does not define a preference order.</t>
 </dd>
-</dl>
-
-<sourcecode type="json">{
-  &quot;otp_algorithm&quot;: {
-    &quot;one_of&quot;: [
-      { &quot;value&quot;: &quot;TOTP&quot; },
-      { &quot;value&quot;: &quot;HOTP&quot; }
-    ]
-  }
-}
-</sourcecode>
-
-<dl>
+<dt><tt>null</tt></dt>
+<dd><t>Requests disclosure of the named metadata or property when available and permitted.</t>
+</dd>
+<dt><tt>value</tt></dt>
+<dd><t>Expresses one acceptable value. The <tt>amr_identifier</tt> constraint <bcp14>MUST</bcp14> contain a single <tt>value</tt> member whose value is a string identifying one Authentication Method. Alternatives between Authentication Methods or Authentication Method Request Expressions <bcp14>MUST</bcp14> be represented using <tt>one_of</tt>. For metadata and properties, <tt>value</tt> expresses a value constraint whose effect depends on <tt>essential</tt>, as defined in <xref target="essential-logic"></xref>.</t>
+</dd>
+<dt><tt>values</tt></dt>
+<dd><t>Expresses a set of acceptable values for a metadata or property field. The <tt>values</tt> member <bcp14>MUST</bcp14> be a non-empty JSON array and <bcp14>MUST NOT</bcp14> be used with <tt>amr_identifier</tt>. <tt>value</tt> and <tt>values</tt> <bcp14>MUST NOT</bcp14> occur in the same constraint. Alternatives between primitive metadata or property values <bcp14>MUST</bcp14> be expressed using <tt>values</tt>, rather than by placing <tt>one_of</tt> or <tt>all_of</tt> inside a field constraint.</t>
+</dd>
 <dt><tt>min</tt> and <tt>max</tt></dt>
-<dd><t>Quantitative constraints applicable to numeric attributes. These operators <bcp14>MUST</bcp14> only be evaluated when the target attribute is a JSON Number. If a type mismatch occurs (<em>e.g.</em>, applying <tt>min</tt> to a JSON String), or if the attribute value does not satisfy the constraint, the OP <bcp14>MUST</bcp14> ignore the constraint for processing purposes, consistent with the treatment of descriptive attributes described in <xref target="essential-logic"></xref>.</t>
+<dd><t>Quantitative constraints applicable only to JSON Numbers. A type mismatch or a value outside the requested range means that the constraint is not satisfied. When both are present, <tt>min</tt> <bcp14>MUST NOT</bcp14> be greater than <tt>max</tt>.</t>
 </dd>
 <dt><tt>max_age</tt></dt>
-<dd><t>Temporal constraint indicating the maximum allowable age, in seconds, of an Authentication Method execution relative to the current request processing time. If the elapsed time since <tt>amr_metadata.time</tt> exceeds this value, the OP <bcp14>SHOULD NOT</bcp14> generate an error; instead, it <bcp14>MUST</bcp14> report the actual <tt>amr_metadata.time</tt> in the response, allowing the RP to enforce its own freshness policy.</t>
+<dd><t>A temporal constraint, in seconds, that <bcp14>MAY</bcp14> appear only in an <tt>amr_metadata.time</tt> constraint and is applied to the actual execution time of the corresponding Authentication Method Execution. Its value <bcp14>MUST</bcp14> be a non-negative integer. A non-essential <tt>max_age</tt> is a best-effort freshness preference: the OP <bcp14>SHOULD</bcp14> attempt a fresh execution but <bcp14>MAY</bcp14> reuse an older execution and report its actual execution time. When locally essential, the execution used to match the method expression <bcp14>MUST</bcp14> be within the requested age. If an existing execution is too old, the OP <bcp14>MUST</bcp14> perform a fresh execution of that method to satisfy the constraint. Executing another method or refreshing the general session <bcp14>MUST NOT</bcp14> change the execution time of the requested method.</t>
 </dd>
 </dl>
-<t>These operators and constraints allow RPs to express complex Authentication Requirements in a structured and machine-interpretable manner, enhancing the negotiation capabilities of the OIDC protocol. The following non-normative example illustrate the use of these operators to express an authentication proccess where biometric authentication is required along with either a password or another OTP:</t>
+<t>Each Authentication Method Request Expression object <bcp14>MUST</bcp14> contain exactly one of <tt>amr_identifier</tt>, <tt>all_of</tt>, or <tt>one_of</tt>. A single-method expression <bcp14>MAY</bcp14> also contain <tt>amr_metadata</tt> and <tt>amr_properties</tt> constraints applying to that method. The value of <tt>amr_identifier</tt> <bcp14>MUST</bcp14> be a non-empty object containing exactly one <tt>value</tt> member whose value is a string identifying one Authentication Method. Each requested metadata or property field <bcp14>MUST</bcp14> have either a <tt>null</tt> value or a non-empty constraint object. When multiple constraint operators occur in the same object, they are evaluated conjunctively. The Claim Request Object's top-level <tt>essential</tt> member <bcp14>MAY</bcp14> appear only in the outer <tt>amr_details</tt> Claim Request Object and <bcp14>MUST</bcp14> be a JSON Boolean. A constraint object for an <tt>amr_metadata</tt> or <tt>amr_properties</tt> field <bcp14>MAY</bcp14> contain its own <tt>essential</tt> member, which <bcp14>MUST</bcp14> be a JSON Boolean and has the local semantics defined in <xref target="essential-logic"></xref>. A constraint-level <tt>essential</tt> <bcp14>MUST NOT</bcp14> appear in <tt>amr_identifier</tt>, and neither form of <tt>essential</tt> <bcp14>MUST</bcp14> appear in a nested logical expression object. An empty expression, an empty logical-operator array, an expression containing more than one expression-form member, an unknown operator, <tt>max_age</tt> outside <tt>amr_metadata.time</tt>, or an invalid JSON type <bcp14>MUST</bcp14> result in <tt>invalid_request</tt>. An unsupported Authentication Method causes the corresponding single-method expression not to match. An unrecognized metadata or property field has no matching value; a locally essential constraint on that field causes the corresponding single-method expression not to match, while a non-essential constraint does not prevent it from matching. The OP <bcp14>MUST NOT</bcp14> fabricate or disclose a value for an unrecognized field.</t>
+<t>The following non-normative example expresses a preference for facial recognition together with either a password or an OTP:</t>
 
-<sourcecode type="json">{
-  &quot;claims&quot;: {
-    &quot;id_token&quot;: {
-      &quot;amr_details&quot;: {
-        &quot;all_of&quot;: [
+<sourcecode type="json"><![CDATA[{
+  "claims": {
+    "id_token": {
+      "amr_details": {
+        "all_of": [
           {
-            &quot;amr_identifier&quot;: { &quot;value&quot;: &quot;face&quot; }
+            "amr_identifier": { "value": "face" }
           },
           {
-            &quot;one_of&quot;: [
+            "one_of": [
               {
-                &quot;amr_identifier&quot;: { &quot;value&quot;: &quot;pwd&quot; }
+                "amr_identifier": { "value": "pwd" }
               },
               {
-                &quot;amr_identifier&quot;: { &quot;value&quot;: &quot;otp&quot; },
-                &quot;amr_properties&quot;: { &quot;otp_length&quot;: null, &quot;otp_algorithm&quot;: null }
+                "amr_identifier": { "value": "otp" },
+                "amr_properties": {
+                  "otp_length": null,
+                  "otp_algorithm": null
+                }
               }
             ]
           }
@@ -1120,79 +1054,113 @@
     }
   }
 }
-</sourcecode>
+]]></sourcecode>
 <t>More examples of requesting Authentication Methods and attributes using the <tt>claims</tt> parameter are provided in <xref target="sec-auth-method-request-examples"></xref>.</t>
 </section>
 
-<section anchor="essential-logic"><name>Logical Operators and the <tt>essential</tt> Clause</name>
+<section anchor="essential-logic"><name>Essential and Non-Essential Requests</name>
 <t>The semantic interpretation of the <tt>essential</tt> parameter within logical structures is defined as follows:</t>
 
-<ul>
-<li><t>When <tt>essential</tt> is applied to the <tt>amr_details</tt> claim as a whole, or to descriptive attributes of Authentication Methods (such as metadata or properties), its behavior follows the behavior described in <eref target="https://openid.net/specs/openid-connect-core-1_0.html#IndividualClaimsRequests">Section 5.5.1</eref> of <xref target="OpenID.Core" sectionFormat="bare" relative="#" section="OIDC Core"></xref>. In such cases, the Authorization Server <bcp14>MUST NOT</bcp14> generate an error if the requested information is not returned, regardless of whether it is marked as Essential or Voluntary.</t>
-</li>
-<li><t>When <tt>essential</tt> is applied to a specific Authentication Method, identified through the <tt>amr_identifier</tt> element, it expresses a strict Authentication Requirement. If the Authorization Server is unable to authenticate the End-User using the specified Authentication Method, the Authorization Server <bcp14>MUST</bcp14> treat that outcome as a failed authentication attempt. The following rules apply when evaluating <tt>essential</tt> within different contexts of the requirement expression:</t>
+<ul spacing="compact">
+<li><t>When applied to the top-level <tt>amr_details</tt> Claim Request Object, <tt>essential</tt> serves two purposes:</t>
 
-<dl newline="true">
-<dt><strong>Within <tt>all_of</tt></strong></dt>
-<dd><t>All elements marked as <tt>essential</tt> within an <tt>all_of</tt> group <bcp14>MUST</bcp14> be satisfied. Failure to satisfy any essential element results in an authentication failure.</t>
-</dd>
-<dt><strong>Within <tt>one_of</tt></strong></dt>
-<dd><t>If a <tt>one_of</tt> group is required, the OP <bcp14>MUST</bcp14> satisfy at least one path that meets the essentiality requirements. If the RP marks specific elements within a <tt>one_of</tt> group as <tt>essential</tt>, it indicates a mandatory preference. If none of the essential elements within the group can be satisfied, the OP <bcp14>MUST</bcp14> treat the attempt as a failure, even if non-essential elements are available.</t>
-</dd>
-</dl></li>
+<ol spacing="compact">
+<li>If the <tt>amr_details</tt> Claim request is unconstrained (contains no expression), <tt>essential</tt> indicates whether the RP requires the OP to return a complete and conforming <tt>amr_details</tt> Claim. If <tt>essential</tt> is omitted or set to <tt>false</tt>, the OP <bcp14>MAY</bcp14> return a complete Claim but <bcp14>MAY</bcp14> also omit it without causing authentication failure.</li>
+<li>If the <tt>amr_details</tt> Claim request contains an Authentication Method Request Expression, <tt>essential</tt> indicates whether the RP requires the OP to satisfy the expression. If <tt>essential</tt> is omitted or set to <tt>false</tt>, the OP <bcp14>SHOULD</bcp14> attempt to satisfy the expression but <bcp14>MAY</bcp14> continue according to its own authentication policy if it cannot do so. If <tt>essential</tt> is set to <tt>true</tt>, the OP <bcp14>MUST</bcp14> satisfy the expression and return a complete and conforming <tt>amr_details</tt> Claim; otherwise, it <bcp14>MUST</bcp14> fail the request as specified in <xref target="sec-error-handling"></xref>.</li>
+</ol></li>
 </ul>
-<t><strong>Note:</strong> This distinction allows RPs to strictly require specific Authentication Methods when necessary, while preserving OpenID Connect compatibility and avoiding unnecessary authentication failures when only descriptive authentication information is unavailable.</t>
-<t>A non-normative example of requesting a password-based Authentication Method as essential is provided below:</t>
+<t>In both cases, when the top-level <tt>essential</tt> member is omitted or set to <tt>false</tt>, the Claim is requested as a Voluntary Claim, as defined in <eref target="https://openid.net/specs/openid-connect-core-1_0.html#IndividualClaimsRequests">Section 5.5.1</eref> of OIDC Core <xref target="OpenID.Core"></xref>.</t>
 
-<sourcecode type="json">{
-  &quot;claims&quot;: {
-    &quot;id_token&quot;: {
-      &quot;amr_details&quot;: {
-        &quot;amr_identifier&quot;: {
-          &quot;value&quot;    : &quot;pwd&quot;,
-          &quot;essential&quot;: true
-        }
+<ul spacing="compact">
+<li>When <tt>essential</tt> is applied to an Authentication Method Metadata or Authentication Method Properties constraint, it indicates whether the RP requires the OP to satisfy that specific constraint. When set to <tt>true</tt>, the named field <bcp14>MUST</bcp14> be present and its value <bcp14>MUST</bcp14> satisfy the constraint for the corresponding Authentication Method Execution to match the single-method expression. When omitted or set to <tt>false</tt>, the constraint is best-effort and does not prevent the method from matching. A locally essential constraint affects only the expression in which it occurs and does not become an independent requirement outside an enclosing <tt>one_of</tt> expression.</li>
+</ul>
+<t>For example, the following request requires either facial recognition with successful liveness detection or proof of possession of a key:</t>
+
+<sourcecode type="json"><![CDATA[{
+  "claims": {
+    "id_token": {
+      "amr_details": {
+        "essential": true,
+        "one_of": [
+          {
+            "amr_identifier": { "value": "face" },
+            "amr_properties": {
+              "face_liveness_detection": {
+                "essential": true,
+                "value": true
+              }
+            }
+          },
+          {
+            "amr_identifier": { "value": "pop" }
+          }
+        ]
       }
     }
   }
 }
-</sourcecode>
+]]></sourcecode>
+<t>If <tt>face_liveness_detection</tt> is absent or false, only the <tt>face</tt> branch fails; the <tt>pop</tt> branch can still satisfy the expression.</t>
 </section>
 
 <section anchor="sec-processing-requirements"><name>Processing Requirements</name>
-<t>When processing an <tt>amr_details</tt> request, the Authorization Server <bcp14>MUST</bcp14> evaluate the requirement expression as follows:</t>
+<t>An OP that declares <tt>amr_details_request_supported</tt> as <tt>true</tt> <bcp14>MUST</bcp14> process an <tt>amr_details</tt> request as follows:</t>
 
 <ul>
-<li><t>The OP <bcp14>MUST</bcp14> attempt to satisfy the logical tree of the expression, prioritizing Authentication Methods that fulfill <tt>essential: true</tt> criteria applied to the <tt>amr_identifier</tt> element.</t>
+<li><t>Validate the request structure and return an <tt>invalid_request</tt> error when it is malformed;</t>
 </li>
-<li><t>For all other attributes, including metadata in <tt>amr_properties</tt> or contextual info in <tt>amr_metadata</tt>, the OP <bcp14>SHOULD</bcp14> perform a &quot;best-effort&quot; satisfaction of the constraints. Type mismatches or unsatisfied quantitative/temporal constraints on these descriptive attributes <bcp14>MUST NOT</bcp14> result in an authentication failure at the OP level.</t>
+<li><t>Plan and perform authentication according to its own policy while considering the requested expression;</t>
 </li>
-<li><t>The OP <bcp14>MAY</bcp14> provide more information than requested if such data is mandatory under its own policy, or less information if some parameters are optional or unsupported.</t>
+<li><t>Evaluate a single-method expression as matching when at least one successful Authentication Method Execution has an acceptable <tt>amr_identifier</tt> and satisfies every locally essential metadata or property constraint;</t>
 </li>
-<li><t>If an Authentication Method explicitly identified through the <tt>amr_identifier</tt> element is marked as <tt>essential</tt> and cannot be satisfied, the Authorization Server <bcp14>MUST</bcp14> return an error as defined in <xref target="sec-error-handling"></xref>.</t>
+<li><t>Evaluate logical expressions according to the <tt>all_of</tt> and <tt>one_of</tt> semantics defined above;</t>
 </li>
-<li><t>In all other cases, the OP <bcp14>SHOULD</bcp14> proceed with the authentication and return the <tt>amr_details</tt> claim reflecting the methods and metadata employed, enabling the RP to perform its own final policy evaluation.</t>
+<li><t>Return an error as specified in <xref target="sec-error-handling"></xref> when a top-level essential request cannot be satisfied;</t>
+</li>
+<li><t>For a non-essential request that cannot be satisfied, the OP <bcp14>MAY</bcp14> continue according to its own authentication policy and return the <tt>amr_details</tt> Claim describing the Authentication Event that actually occurred.</t>
 </li>
 </ul>
-<t>This behavior preserves continuity of authentication while maintaining transparency for the RP, which can then evaluate the returned <tt>amr_details</tt> against its own acceptance criteria. If the RP requires strict adherence to its requested Authentication Methods, it <bcp14>MUST</bcp14> implement its own logic to assess the returned <tt>amr_details</tt> and decide whether to accept or reject the authentication based on the actual methods employed. The OP is not responsible for enforcing the RP's policies beyond attempting to meet the requested conditions.</t>
+<t>Non-essential metadata and property constraints <bcp14>SHOULD</bcp14> be satisfied on a best-effort basis and <bcp14>MUST NOT</bcp14> independently cause authentication failure. Requested values <bcp14>MUST NOT</bcp14> replace the values that were actually observed. Claim completeness, disclosure, consistency across delivery locations, and reuse of earlier Authentication Method Executions are governed by <xref target="sec-amr-details-delivery"></xref>.</t>
+<t>RPs <bcp14>MUST</bcp14> evaluate the returned <tt>amr_details</tt> Claim against their local policies, particularly when the request is non-essential. RPs seeking an abstract assurance level rather than a concrete Authentication Method <bcp14>SHOULD</bcp14> use <tt>acr</tt> and use <tt>amr_details</tt> to understand how the OP satisfied that assurance requirement.</t>
 </section>
 
 <section anchor="sec-error-handling"><name>Error Handling</name>
-<t>This specification does not introduce new error codes, error responses, or error handling mechanisms beyond those defined by <xref target="OpenID.Core" sectionFormat="bare" relative="#" section="OpenID Connect Core"></xref> and related specifications. However, specific error conditions arise from the processing of <tt>amr_details</tt> requests and Authentication Method requirements:</t>
+<t>A malformed request structure, invalid JSON type, unknown or prohibited operator, empty expression, or structurally invalid combination <bcp14>MUST</bcp14> result in <tt>invalid_request</tt>.</t>
+<t>If an essential <tt>amr_details</tt> Claim request or Authentication Method Request Expression cannot be satisfied, the OP <bcp14>MUST</bcp14> return the <tt>unmet_authentication_requirements</tt> error defined by OpenID Connect Core Error Code unmet_authentication_requirements <xref target="OpenID.UnmetAuthn"></xref>. This includes inability to produce a complete and conforming Claim, failure of every expression branch because of a locally essential constraint, or inability to perform a required fresh Authentication Method Execution.</t>
+<t>The public <tt>error_description</tt> <bcp14>MUST</bcp14> remain generic and <bcp14>MUST NOT</bcp14> identify the method or distinguish lack of enrollment, unsupported or unavailable methods, missing credentials, verification failure, or failure of a method-specific constraint. Detailed diagnostics <bcp14>MAY</bcp14> be logged internally or displayed locally by the OP.</t>
+<t>The <tt>access_denied</tt> error <bcp14>SHOULD</bcp14> be used when the End-User explicitly cancels or refuses the authentication or authorization request.</t>
+</section>
+</section>
 
-<ul>
-<li><t>If a requirement expression contains Authentication Methods or constraints marked as <tt>essential</tt> that cannot be satisfied (due to OP limitations, End-User unavailability of factors, or verification failure), the Authorization Server <bcp14>MUST</bcp14> interrupt the flow and return an error to the RP.</t>
-</li>
-<li><t>The OP <bcp14>MUST</bcp14> use the <tt>access_denied</tt> error code, as defined in <eref target="https://www.rfc-editor.org/rfc/rfc6749#section-4.1.2.1">Section 4.1.2.1</eref> of <xref target="RFC6749" sectionFormat="bare" relative="#" section="RFC 6749"></xref>. The OP <bcp14>SHOULD</bcp14> include an <tt>error_description</tt> parameter detailing which part of the requirement expression (<em>e.g.</em>, which <tt>amr_identifier</tt>) could not be satisfied to assist the RP in guiding the End-User.</t>
-</li>
-</ul>
-<t>All other error conditions arising from the processing of <tt>amr_details</tt> requests and Authentication Method requirements <bcp14>MUST</bcp14> be handled in accordance with the error handling rules defined by <xref target="OpenID.Core" sectionFormat="bare" relative="#" section="OIDC"></xref>, including those applicable to the Authorization Endpoint, Token Endpoint, and other relevant protocol endpoints.</t>
-<t>If the Authorization Server does not support processing Authentication Method requirements conveyed through the <tt>claims</tt> parameter, as indicated by the absence of support declaration in its metadata, the Authorization Server <bcp14>MUST NOT</bcp14> treat such requests as an error. In this case, the Authorization Server <bcp14>SHOULD</bcp14> ignore the Authentication Method requirements and proceed with authentication according to its default behavior, subject to its internal policies and capabilities.</t>
+<section anchor="sec-amr-details-delivery"><name><tt>amr_details</tt> Delivery</name>
+<t>This section defines the rules governing <em>when</em> and <em>how</em> the <tt>amr_details</tt> Claim is returned by the OP.</t>
+<t>The delivery of the <tt>amr_details</tt> Claim follows the general OIDC principles for Claims issuance defined in <eref target="https://openid.net/specs/openid-connect-core-1_0.html#Claims">Section 5</eref> of OIDC Core <xref target="OpenID.Core"></xref>, subject to the additional completeness, consistency, and essential-request rules defined by this specification.</t>
+
+<section anchor="conditions-for-delivery-of-the-amr-details-claim"><name>Conditions for Delivery of the <tt>amr_details</tt> Claim</name>
+<t>An OP is not required to return the <tt>amr_details</tt> Claim unless it is explicitly requested by the RP.</t>
+<t>When requested, the OP <bcp14>MUST</bcp14> evaluate the <tt>amr_details</tt> Claim request according to its capabilities and the processing rules defined in this specification (see <xref target="sec-processing-requirements"></xref>). Essentiality is determined by the top-level <tt>essential</tt> member of that Claim request, as defined in <xref target="essential-logic"></xref>. If that member is absent or <tt>false</tt> and the OP cannot construct and disclose a complete and conforming <tt>amr_details</tt> Claim, the OP <bcp14>MAY</bcp14> omit the entire Claim. It <bcp14>MUST NOT</bcp14> return a partial Authentication Event as though it were complete. If the top-level member is <tt>true</tt>, an OP supporting request processing <bcp14>MUST</bcp14> satisfy the Claim request or fail the Authentication Request as defined in <xref target="sec-error-handling"></xref>.</t>
+<t>An OP <bcp14>MAY</bcp14> return the <tt>amr_details</tt> Claim without an explicit request from the RP, based on internal policies, trust frameworks, regulatory obligations, or default Claim issuance rules. The determination of such policies is outside the scope of this specification.</t>
+</section>
+
+<section anchor="complete-authentication-event"><name>Complete Authentication Event</name>
+<t>When the <tt>amr_details</tt> Claim is returned, it <bcp14>MUST</bcp14> contain an AMR Details Object for every Authentication Method Execution included in the corresponding Authentication Event. Authentication Method Request Expressions (see <xref target="sec-req"></xref>) <bcp14>MUST NOT</bcp14> remove Authentication Method Executions from the returned Claim. Each returned AMR Details Object <bcp14>MUST</bcp14> include at least <tt>amr_identifier</tt> and the mandatory <tt>amr_metadata.time</tt>. Partial disclosure <bcp14>MAY</bcp14> apply only to optional Authentication Method Metadata and Authentication Method Properties.</t>
+</section>
+
+<section anchor="authentication-event-consistency"><name>Authentication Event Consistency</name>
+<t>The <tt>amr_details</tt> Claim <bcp14>MUST</bcp14> describe the Authentication Event relied upon by the OP for the corresponding authorization grant. Authentication Method Executions performed subsequently in the same SSO session <bcp14>MUST NOT</bcp14> be added to Claims returned for that grant. Concurrent grants <bcp14>MUST NOT</bcp14> cause the Authentication Event reported for one grant to be replaced by the event associated with another grant.</t>
+<t>An Authentication Request that reuses an SSO session <bcp14>MAY</bcp14> rely on earlier Authentication Method Executions, but their original execution times <bcp14>MUST</bcp14> be preserved.</t>
+<t>If <tt>amr_details</tt> is included in an ID Token returned in response to a refresh token request, it <bcp14>MUST</bcp14> describe the Authentication Event associated with that authorization grant. If included in a UserInfo response, it <bcp14>MUST</bcp14> describe the Authentication Event associated with the authorization grant under which the Access Token was issued.</t>
+</section>
+
+<section anchor="delivery-mechanisms"><name>Delivery Mechanisms</name>
+<t>When an RP explicitly requests the <tt>amr_details</tt> Claim, the OP <bcp14>MUST</bcp14>, subject to the omission and error rules above, return the Claim in the location or locations specified in the request, such as within the ID Token or via the UserInfo Endpoint, as defined by OIDC Core <xref target="OpenID.Core"></xref>. If the RP does not explicitly request the Claim and the OP elects to return it based on internal policy, the OP <bcp14>MAY</bcp14> choose the delivery location.</t>
+<t>Claims delivered through different locations for the same authorization grant <bcp14>MUST</bcp14> represent the same complete set of Authentication Method Executions. Optional metadata and properties disclosed for each execution <bcp14>MAY</bcp14> differ according to the request and applicable disclosure policy (see <xref target="sec-disclosure-policy"></xref>). Any field disclosed in more than one location <bcp14>MUST</bcp14> have the same value and semantic meaning.</t>
+<t>When the <tt>id_token</tt> and <tt>userinfo</tt> members of the <tt>claims</tt> parameter contain different Authentication Method Request Expressions, the OP <bcp14>MUST</bcp14> combine the expressions from top-level essential Claim requests conjunctively for the Authentication Request. Expressions from non-essential Claim requests remain independent best-effort preferences. Disclosure is evaluated independently for each location, subject to the complete-event requirements above.</t>
 </section>
 </section>
 
 <section anchor="sec-op-metadata"><name>OP Metadata</name>
-<t>This specification defines additional OpenID Provider Metadata parameters (<xref target="OpenID.Discovery" sectionFormat="bare" relative="#" section="see OpenID Connect Discovery 1.0"></xref>) that allow RPs to determine the level of support for the <tt>amr_details</tt> Claim and for Authentication Method requests.</t>
+<t>This specification defines additional OpenID Provider Metadata parameters (see OpenID Connect Discovery 1.0 <xref target="OpenID.Discovery"></xref>) that allow RPs to determine the level of support for the <tt>amr_details</tt> Claim and for Authentication Method requests.</t>
 <t>Support for this specification is intentionally divided into two distinct and independent capabilities:</t>
 
 <dl newline="true">
@@ -1206,31 +1174,32 @@
 <t><strong>Note:</strong> This separation allows OPs to adopt this specification incrementally, supporting the emission of <tt>amr_details</tt> as an informational claim without necessarily implementing Authentication Method negotiation.</t>
 
 <section anchor="informational-support-for-amr-details"><name>Informational Support for <tt>amr_details</tt></name>
-<t>An OP that is capable of returning the <tt>amr_details</tt> Claim as part of an ID Token or via the UserInfo Endpoint <bcp14>MUST</bcp14> declare this capability by including <tt>amr_details</tt> in the <tt>claims_supported</tt> metadata parameter defined by <xref target="OpenID.Discovery" sectionFormat="bare" relative="#" section="OpenID Connect Discovery"></xref>.</t>
+<t>An OP that is capable of returning the <tt>amr_details</tt> Claim as part of an ID Token or via the UserInfo Endpoint <bcp14>MUST</bcp14> declare this capability by including <tt>amr_details</tt> in the <tt>claims_supported</tt> metadata parameter defined by OpenID Connect Discovery <xref target="OpenID.Discovery"></xref>.</t>
 <t>The presence of <tt>amr_details</tt> in <tt>claims_supported</tt> indicates that the OP <bcp14>MAY</bcp14> return the <tt>amr_details</tt> Claim when requested, describing the Authentication Methods used during the authentication of the End-User.</t>
 <t>This declaration does not imply that the OP supports processing Authentication Method requirements expressed by the RP.</t>
 </section>
 
 <section anchor="request-processing-support-for-authentication-method-negotiation"><name>Request Processing Support for Authentication Method Negotiation</name>
-<t>An OP that supports processing Authentication Method requirements expressed through the <tt>claims</tt> parameter, including constraints and essentiality applied to Authentication Methods, <bcp14>MUST</bcp14> declare this capability using the following metadata parameter:</t>
+<t>An OP that supports processing Authentication Method requirements expressed through the <tt>claims</tt> parameter, including top-level essentiality and method-specific constraints, <bcp14>MUST</bcp14> support informational delivery of <tt>amr_details</tt> and declare that capability in <tt>claims_supported</tt>. It <bcp14>MUST</bcp14> also declare its request-processing capability using the following metadata parameter:</t>
 
 <dl newline="true">
 <dt><tt>amr_details_request_supported</tt></dt>
-<dd><t>OPTIONAL. Boolean value indicating whether the OP supports processing Authentication Method requests conveyed via the <tt>claims</tt> parameter, as defined in this specification. If omitted or set to <tt>false</tt>, the OP does not process Authentication Method requirements and treats any such request as informational only. An OP that sets <tt>amr_details_request_supported</tt> to <tt>true</tt> <bcp14>MUST</bcp14> comply with the processing rules defined in this specification for Authentication Method requests, including the handling of essential authentication factors and authentication failure conditions.</t>
+<dd><t>OPTIONAL. Boolean value indicating whether the OP supports processing Authentication Method requests conveyed via the <tt>claims</tt> parameter, as defined in this specification. If omitted or set to <tt>false</tt>, the OP does not process Authentication Method requirements and treats any such request as informational only. An OP that sets <tt>amr_details_request_supported</tt> to <tt>true</tt> <bcp14>MUST</bcp14> comply with the processing rules defined in this specification for Authentication Method requests, including the handling of essential Claim requests, essential expressions, and authentication failure conditions.</t>
 </dd>
 </dl>
 <t>RPs that require strict enforcement of Authentication Method requirements <bcp14>MUST</bcp14> verify that <tt>amr_details_request_supported</tt> is set to <tt>true</tt> before issuing such requests.</t>
+<t>If <tt>amr_details_request_supported</tt> is omitted or set to <tt>false</tt>, the OP <bcp14>MUST NOT</bcp14> treat an Authentication Method expression received through the <tt>claims</tt> parameter as an error. It <bcp14>SHOULD</bcp14> ignore the expression and proceed according to its default behavior, subject to its internal policies and capabilities. A request for the <tt>amr_details</tt> Claim itself remains subject to the OP's informational support and ordinary Claim processing rules.</t>
 <t>The following metadata parameters are OPTIONAL and provide additional information about the Authentication Methods and constraints supported by the OP. When present, they <bcp14>MUST</bcp14> accurately reflect the provider's capabilities.</t>
 
 <dl newline="true">
 <dt><tt>amr_identifiers_supported</tt></dt>
-<dd><t>OPTIONAL. JSON array of strings. Enumerates Authentication Methods supported by the OP, preferably using identifiers registered in <xref target="RFC8176" sectionFormat="bare" relative="#" section="RFC 8176"></xref> (<em>e.g.</em>, <tt>pwd</tt>, <tt>otp</tt>, <tt>face</tt>, <tt>hwk</tt>).</t>
+<dd><t>OPTIONAL. JSON array of strings. Enumerates Authentication Method Identifiers that the OP is capable of returning in <tt>amr_details</tt> and, when <tt>amr_details_request_supported</tt> is <tt>true</tt>, processing in Authentication Method Request Expressions. This parameter is an informational capability advertisement and does not assert that every listed identifier is available for every End-User or authorization transaction. Identifiers SHOULD be registered in RFC 8176 <xref target="RFC8176"></xref> when applicable (<em>e.g.</em>, <tt>pwd</tt>, <tt>otp</tt>, <tt>face</tt>, <tt>hwk</tt>).</t>
 </dd>
 <dt><tt>&lt;amr&gt;_properties_supported</tt></dt>
-<dd><t>OPTIONAL. For each Authentication Method <tt>&lt;amr&gt;</tt> listed in <tt>amr_identifiers_supported</tt>, the OP <bcp14>MAY</bcp14> declare a corresponding metadata field named <tt>&lt;amr&gt;_properties_supported</tt>. This field is a JSON array of strings enumerating the specific metadata supported by the OP for that Authentication Method. For example, if <tt>otp</tt> is listed in <tt>amr_identifiers_supported</tt>, the OP <bcp14>SHOULD</bcp14> declare <tt>otp_properties_supported</tt> to indicate which OTP-related attributes (<em>e.g.</em>, <tt>otp_length</tt>, <tt>otp_algorithm</tt>) it can process or provide. The OP <bcp14>SHOULD</bcp14> use the attribute names defined in <xref target="sec-method-properties"></xref> of this specification.</t>
+<dd><t>OPTIONAL. For each Authentication Method <tt>&lt;amr&gt;</tt> listed in <tt>amr_identifiers_supported</tt>, the OP <bcp14>MAY</bcp14> declare a corresponding metadata field named <tt>&lt;amr&gt;_properties_supported</tt>. This field is a JSON array of strings enumerating the specific properties that the OP can return in <tt>amr_details</tt> and, when <tt>amr_details_request_supported</tt> is <tt>true</tt>, process in Authentication Method Request Expressions. This parameter is an informational capability advertisement and does not assert that every listed property is available for every End-User or Authentication Method Execution. For example, if <tt>otp</tt> is listed in <tt>amr_identifiers_supported</tt>, the OP <bcp14>SHOULD</bcp14> declare <tt>otp_properties_supported</tt> to indicate which OTP-related properties (<em>e.g.</em>, <tt>otp_length</tt>, <tt>otp_algorithm</tt>) it can process or provide. The OP <bcp14>SHOULD</bcp14> use the property names defined in <xref target="sec-method-properties"></xref> of this specification.</t>
 </dd>
-<dt><tt>&lt;amr_properties&gt;_values_supported</tt></dt>
-<dd><t>OPTIONAL. For each <tt>amr_properties</tt> parameter defined in <xref target="sec-method-properties"></xref>, the OP <bcp14>MAY</bcp14> declare a corresponding metadata field named <tt>&lt;amr_properties&gt;_values_supported</tt>. This field is a JSON array of strings enumerating the specific values supported by the OP for that <tt>amr_properties</tt> parameter. For example, if <tt>otp_algorithm</tt> is defined (<em>i.e.</em>, <tt>otp_properties_supported</tt> contains <tt>otp_algorithm</tt>), the OP <bcp14>MUST</bcp14> declare <tt>otp_algorithm_values_supported</tt> to indicate which OTP algorithms (<em>e.g.</em>, <tt>TOTP</tt>, <tt>HOTP</tt>) it can process or provide. The OP <bcp14>SHOULD</bcp14> use the value names defined in <xref target="sec-method-properties"></xref> of this specification whenever possible.</t>
+<dt><tt>&lt;property&gt;_values_supported</tt></dt>
+<dd><t>OPTIONAL. For a string-valued property, an OP <bcp14>MAY</bcp14> declare a corresponding metadata field named <tt>&lt;property&gt;_values_supported</tt> when the values it can return or, when <tt>amr_details_request_supported</tt> is <tt>true</tt>, process can be represented by a finite JSON array of strings. This field enumerates the OP's supported values; it does not assert that the array exhausts the property's vocabulary as defined by its profile. It <bcp14>MUST NOT</bcp14> be used to enumerate numbers, booleans, timestamps, objects, identifiers, or an open or unbounded value domain. The JSON type and semantics of each property are defined by the applicable Authentication Method Properties profile and need not be repeated in Discovery. Advertising a property indicates capability; it does not imply that the property is available for every End-User or Authentication Method Execution, or that every requested value can be satisfied.</t>
 </dd>
 <dt><tt>trust_framework_values_supported</tt></dt>
 <dd><t>OPTIONAL. JSON array of strings. Enumerates trust frameworks recognized or supported by the OP for contextual information (<em>e.g.</em>, <tt>eIDAS</tt>, <tt>NIST SP 800-63</tt>).</t>
@@ -1265,7 +1234,7 @@
 
 <section anchor="integrity-and-authenticity"><name>Integrity and Authenticity</name>
 <t>RPs <bcp14>MUST</bcp14> treat the <tt>amr_details</tt> Claim as trustworthy only when it is obtained through mechanisms that provide integrity and authenticity guarantees equivalent to those defined by OIDC.</t>
-<t>Specifically, a RP <bcp14>MUST</bcp14> only rely on <tt>amr_details</tt> when the Claim is:</t>
+<t>Specifically, an RP <bcp14>MUST</bcp14> only rely on <tt>amr_details</tt> when the Claim is:</t>
 
 <ul>
 <li><t>Included in a valid ID Token issued by the OP and whose signature, issuer (<tt>iss</tt>), audience (<tt>aud</tt>), and temporal Claims (such as <tt>exp</tt> and <tt>iat</tt>) have been successfully validated; or</t>
@@ -1277,10 +1246,9 @@
 </section>
 
 <section anchor="downgrade-attacks-and-enforcement-of-authentication-requirements"><name>Downgrade Attacks and Enforcement of Authentication Requirements</name>
-<t>When Authentication Method requirements are expressed by the RP, the OP may authenticate the End-User using the best available Authentication Method according to its capabilities and policies, unless strict requirements are explicitly enforced as defined in this specification.</t>
-<t>Regardless of the OP behavior, RPs <bcp14>MUST</bcp14> evaluate the returned <tt>amr_details</tt> Claim against their local authentication policies.</t>
-<t>If the Authentication Methods used do not satisfy the RP's requirements, the RP <bcp14>MUST</bcp14> treat the Authentication Event as incomplete and <bcp14>MUST NOT</bcp14> grant access solely based on the successful completion of the OpenID Connect flow.</t>
-<t>This specification intentionally assigns the final enforcement of Authentication Requirements to the RP in order to prevent downgrade attacks and to preserve compatibility with OPs that support informational reporting without Authentication Method negotiation.</t>
+<t>When Authentication Method requirements are expressed by the RP, the OP may authenticate the End-User using the best available Authentication Method according to its capabilities and policies unless the top-level <tt>amr_details</tt> request is essential. For an essential request, the OP <bcp14>MUST</bcp14> enforce the Claim and expression requirements.</t>
+<t>Regardless of OP behavior, RPs <bcp14>MUST</bcp14> validate and evaluate the returned <tt>amr_details</tt> Claim against their local authentication policies, particularly when the request was non-essential or the OP did not advertise request-processing support.</t>
+<t>If the Authentication Methods used do not satisfy the RP's local requirements, the RP <bcp14>MUST NOT</bcp14> grant access solely based on successful completion of the OpenID Connect flow.</t>
 </section>
 
 <section anchor="trust-relationships-and-federated-authentication-sources"><name>Trust Relationships and Federated Authentication Sources</name>
@@ -1291,12 +1259,17 @@
 
 <section anchor="fingerprinting-correlation-and-data-minimization"><name>Fingerprinting, Correlation, and Data Minimization</name>
 <t>The information conveyed by the <tt>amr_details</tt> Claim may reveal characteristics of the End-User's authentication capabilities and environment, which could enable correlation or fingerprinting across RPs.</t>
-<t>OPs <bcp14>SHOULD</bcp14> apply data minimization principles when returning <tt>amr_details</tt>, limiting the information provided to what is necessary to describe the Authentication Context.</t>
+<t>OPs <bcp14>SHOULD</bcp14> apply data minimization principles when returning <tt>amr_details</tt> by limiting optional Authentication Method Metadata and Authentication Method Properties to what is necessary.</t>
 <t>RPs <bcp14>SHOULD</bcp14> request <tt>amr_details</tt> only when required to meet security, regulatory, or compliance objectives. OPs <bcp14>SHOULD NOT</bcp14> return highly identifying or fine-grained authentication details by default unless required by internal policy, trust frameworks, or regulatory obligations.</t>
 </section>
 
+<section anchor="sec-disclosure-policy"><name>Disclosure Policy and Essential Requests</name>
+<t>For the purposes of this specification, an applicable disclosure policy is a policy that constrains the information that an OP may disclose for a particular authorization transaction. Such a policy may derive from the OP's internal policy, a trust framework, a contractual agreement, or a regulatory obligation.</t>
+<t>An applicable disclosure policy <bcp14>MUST</bcp14> be evaluated before an essential expression is considered satisfied. If the policy prevents the OP from returning the complete Authentication Event or a locally essential field, the essential request is not satisfied.</t>
+</section>
+
 <section anchor="replay-and-temporal-considerations"><name>Replay and Temporal Considerations</name>
-<t>The <tt>amr_details</tt> Claim include temporal information describing when Authentication Methods were performed or validated. RPs <bcp14>MAY</bcp14> use such information to evaluate the freshness of the Authentication Context according to their security policies.</t>
+<t>The <tt>amr_details</tt> Claim includes temporal information describing when Authentication Methods were performed or validated. RPs <bcp14>MAY</bcp14> use such information to evaluate the freshness of the Authentication Context according to their security policies.</t>
 <t>RPs <bcp14>SHOULD</bcp14> evaluate the temporal attributes of Authentication Methods to mitigate replay attacks and ensure that the Authentication Context remains valid for the duration of the session or transaction. If the temporal information indicates that Authentication Methods are stale or outdated, the RP <bcp14>MAY</bcp14> require re-authentication or additional verification steps.</t>
 <t>This specification does not define specific temporal thresholds or policies; such decisions <bcp14>MUST</bcp14> be made by the RP based on its security requirements.</t>
 </section>
@@ -1349,18 +1322,28 @@
     <date year="2014" month="Nov" day="8"></date>
   </front>
 </reference>
-<xi:include href="https://xml2rfc.ietf.org/public/rfc/bibxml/reference.RFC.2119.xml"/>
-<xi:include href="https://xml2rfc.ietf.org/public/rfc/bibxml/reference.RFC.3339.xml"/>
-<xi:include href="https://xml2rfc.ietf.org/public/rfc/bibxml/reference.RFC.4226.xml"/>
-<xi:include href="https://xml2rfc.ietf.org/public/rfc/bibxml/reference.RFC.6238.xml"/>
-<xi:include href="https://xml2rfc.ietf.org/public/rfc/bibxml/reference.RFC.6749.xml"/>
-<xi:include href="https://xml2rfc.ietf.org/public/rfc/bibxml/reference.RFC.7515.xml"/>
-<xi:include href="https://xml2rfc.ietf.org/public/rfc/bibxml/reference.RFC.7516.xml"/>
-<xi:include href="https://xml2rfc.ietf.org/public/rfc/bibxml/reference.RFC.7519.xml"/>
-<xi:include href="https://xml2rfc.ietf.org/public/rfc/bibxml/reference.RFC.7914.xml"/>
-<xi:include href="https://xml2rfc.ietf.org/public/rfc/bibxml/reference.RFC.8018.xml"/>
-<xi:include href="https://xml2rfc.ietf.org/public/rfc/bibxml/reference.RFC.8176.xml"/>
-<xi:include href="https://xml2rfc.ietf.org/public/rfc/bibxml/reference.RFC.9106.xml"/>
+<reference anchor="OpenID.UnmetAuthn" target="https://openid.net/specs/openid-connect-unmet-authentication-requirements-1_0-final.html">
+  <front>
+    <title>OpenID Connect Core Error Code unmet_authentication_requirements</title>
+    <author fullname="Torsten Lodderstedt" initials="T." surname="Lodderstedt">
+      <organization>yes.com</organization>
+    </author>
+    <date year="2022" month="November" day="17"></date>
+  </front>
+</reference>
+<xi:include href="https://bib.ietf.org/public/rfc/bibxml/reference.RFC.2119.xml"/>
+<xi:include href="https://bib.ietf.org/public/rfc/bibxml/reference.RFC.3339.xml"/>
+<xi:include href="https://bib.ietf.org/public/rfc/bibxml/reference.RFC.4226.xml"/>
+<xi:include href="https://bib.ietf.org/public/rfc/bibxml/reference.RFC.6238.xml"/>
+<xi:include href="https://bib.ietf.org/public/rfc/bibxml/reference.RFC.6749.xml"/>
+<xi:include href="https://bib.ietf.org/public/rfc/bibxml/reference.RFC.7515.xml"/>
+<xi:include href="https://bib.ietf.org/public/rfc/bibxml/reference.RFC.7516.xml"/>
+<xi:include href="https://bib.ietf.org/public/rfc/bibxml/reference.RFC.7519.xml"/>
+<xi:include href="https://bib.ietf.org/public/rfc/bibxml/reference.RFC.7914.xml"/>
+<xi:include href="https://bib.ietf.org/public/rfc/bibxml/reference.RFC.8018.xml"/>
+<xi:include href="https://bib.ietf.org/public/rfc/bibxml/reference.RFC.8174.xml"/>
+<xi:include href="https://bib.ietf.org/public/rfc/bibxml/reference.RFC.8176.xml"/>
+<xi:include href="https://bib.ietf.org/public/rfc/bibxml/reference.RFC.9106.xml"/>
 <reference anchor="eIDAS" target="https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:32014R0910">
   <front>
     <title>REGULATION (EU) No 910/2014 OF THE EUROPEAN PARLIAMENT AND OF THE COUNCIL on electronic identification and trust services for electronic transactions in the internal market and repealing Directive 1999/93/EC</title>
@@ -1376,242 +1359,222 @@
 <t>All examples in this appendix are non-normative and provided for illustrative purposes only.</t>
 
 <section anchor="sec-auth-method-representation-examples"><name>Authentication Method Representation</name>
-<t>The following non-normative example illustrates an <tt>amr_details</tt> Claim representing an Authentication Event where the End-User authenticated using a password alongside a one-time password method provided by an external authentication broker. The example includes source/contextual information indicating the broker as the issuer of the OTP method including method-specific metadata such as OTP length and algorithm.</t>
+<t>The following example represents the complete Authentication Event relied upon for an authentication in which the End-User used a password and an OTP provided by an external authentication broker:</t>
 
-<sourcecode type="JSON">{
-  &quot;amr&quot;        : [ &quot;pwd&quot;, &quot;otp&quot; ],
-  &quot;amr_details&quot;: [
+<sourcecode type="JSON"><![CDATA[{
+  "amr"        : [ "pwd", "otp" ],
+  "amr_details": [
     {
-      &quot;amr_identifier&quot;: &quot;pwd&quot;,
-      &quot;amr_metadata&quot;  : {
-        &quot;iss&quot;            : &quot;https://idp.gov.com&quot;,
-        &quot;trust_framework&quot;: &quot;eidas&quot;,
-        &quot;assurance_level&quot;: &quot;low&quot;,
-        &quot;time&quot;           : &quot;2025-09-30T18:23:41Z&quot;,
-        &quot;location&quot;       : { &quot;ip_address&quot;: &quot;192.0.2.1&quot;, &quot;country&quot;: &quot;US&quot; }
+      "amr_identifier": "pwd",
+      "amr_metadata"  : {
+        "iss"            : "https://idp.gov.com",
+        "trust_framework": "eidas",
+        "assurance_level": "low",
+        "time"           : "2025-09-30T18:23:41Z",
+        "location"       : { "ip_address": "192.0.2.1", "country": "US" }
       },
-      &quot;amr_properties&quot;: {
-        &quot;pwd_derivation_algorithm&quot;: &quot;argon2id&quot;,
-        &quot;pwd_policy_id&quot;           : &quot;govbr-password-v2&quot;
+      "amr_properties": {
+        "pwd_derivation_algorithm": "argon2id",
+        "pwd_policy_id"           : "govbr-password-v2"
       }
     },
     {
-      &quot;amr_identifier&quot;: &quot;otp&quot;,
-      &quot;amr_metadata&quot;  : {
-        &quot;iss&quot;            : &quot;https://authbroker.com&quot;,
-        &quot;trust_framework&quot;: &quot;custom-broker-framework&quot;,
-        &quot;assurance_level&quot;: &quot;substantial&quot;,
-        &quot;time&quot;           : &quot;2025-09-30T18:23:45Z&quot;,
-        &quot;location&quot;       : { &quot;ip_address&quot;: &quot;192.0.2.1&quot;, &quot;country&quot;: &quot;US&quot; }
+      "amr_identifier": "otp",
+      "amr_metadata"  : {
+        "iss"            : "https://authbroker.com",
+        "trust_framework": "custom-broker-framework",
+        "assurance_level": "substantial",
+        "time"           : "2025-09-30T18:23:45Z",
+        "location"       : { "ip_address": "192.0.2.1", "country": "US" }
       },
-      &quot;amr_properties&quot;: { &quot;otp_length&quot;: 6, &quot;otp_algorithm&quot;: &quot;TOTP&quot; }
+      "amr_properties": { "otp_length": 6, "otp_algorithm": "TOTP" }
     }
   ]
 }
-</sourcecode>
+]]></sourcecode>
 </section>
 
 <section anchor="sec-auth-method-request-examples"><name>Authentication Method Request</name>
-<t>These examples illustrate how a RP can request specific Authentication Methods and attributes using the <tt>claims</tt> parameter in an OpenID Connect authentication request.</t>
 
-<section anchor="userinfo-request-example"><name>Userinfo Request Example</name>
-<t>This example demonstrates how to request an OTP Authentication Method with specific length constraints and algorithm via the UserInfo endpoint:</t>
+<section anchor="non-essential-and-essential-claim-requests"><name>Non-Essential and Essential Claim Requests</name>
+<t>A non-essential, unconstrained request asks for the complete Claim when available, without specifying Authentication Methods (see <xref target="essential-logic"></xref>):</t>
 
-<sourcecode type="json">{
-  &quot;claims&quot;: {
-    &quot;userinfo&quot;: {
-      &quot;amr_details&quot;: {
-        &quot;amr_identifier&quot;: { &quot;value&quot;: &quot;otp&quot; },
-        &quot;amr_properties&quot;: {
-          &quot;otp_length&quot;   : null,
-          &quot;otp_algorithm&quot;: { &quot;value&quot;: &quot;TOTP&quot; }
-        }
-      }
+<sourcecode type="json"><![CDATA[{
+  "claims": {
+    "id_token": {
+      "amr_details": null
     }
   }
 }
-</sourcecode>
+]]></sourcecode>
+<t>An essential unconstrained request requires the complete Claim without prescribing the Authentication Methods:</t>
+
+<sourcecode type="json"><![CDATA[{
+  "claims": {
+    "id_token": {
+      "amr_details": { "essential": true }
+    }
+  }
+}
+]]></sourcecode>
 </section>
 
-<section anchor="using-all-of-and-one-of-operators"><name>Using <tt>all_of</tt> and <tt>one_of</tt> Operators</name>
-<t>In the scenario below, the RP requests that the End-User authenticate using biometric authentication (<tt>face</tt>) along with either a password (<tt>pwd</tt>). Both methods are marked as essential:</t>
+<section anchor="essential-single-method-request"><name>Essential Single-Method Request</name>
+<t>The following request requires the Authentication Event to include facial recognition. Additional methods are not prohibited nor required:</t>
 
-<sourcecode type="json">{
-  &quot;claims&quot;: {
-    &quot;id_token&quot;: {
-      &quot;amr_details&quot;: {
-        &quot;all_of&quot;: [ 
-          {
-            &quot;amr_identifier&quot;: {
-              &quot;value&quot;: &quot;face&quot;,
-              &quot;essential&quot;: true
-            }
-          }, {
-            &quot;amr_identifier&quot;: {
-              &quot;value&quot;: &quot;pwd&quot;,
-              &quot;essential&quot;: true
-            }
-          } 
-        ]
+<sourcecode type="json"><![CDATA[{
+  "claims": {
+    "id_token": {
+      "amr_details": {
+        "essential": true,
+        "amr_identifier": { "value": "face" }
       }
     }
   }
 }
-</sourcecode>
-<t>By using the <tt>one_of</tt> operator, the RP can request that the End-User authenticate using either a password (<tt>pwd</tt>) or a one-time password (<tt>otp</tt>):</t>
-
-<sourcecode type="json">{
-  &quot;claims&quot;: {
-    &quot;id_token&quot;: {
-      &quot;amr_details&quot;: {
-        &quot;one_of&quot;: [
-          {
-            &quot;amr_identifier&quot;: { 
-              &quot;value&quot;: &quot;pwd&quot;
-            }
-          },
-          {
-            &quot;amr_identifier&quot;: {
-              &quot;value&quot;: &quot;otp&quot;
-            }
-          }
-        ]
-      }
-    }
-  }
-}
-</sourcecode>
-
-<section anchor="using-all-of-and-one-of-with-method-metadata"><name>Using <tt>all_of</tt> and <tt>one_of</tt> with Method Metadata</name>
-<t>It is also possible to combine the <tt>all_of</tt> and <tt>one_of</tt> operators with method metadata. In the following example, the RP requests OTP authentication with either numeric or alphanumeric format, along with biometric authentication:</t>
-
-<sourcecode type="json">{
-  &quot;claims&quot;: {
-    &quot;id_token&quot;: {
-      &quot;amr_details&quot;: {
-        &quot;all_of&quot;: [
-          {
-            &quot;amr_identifier&quot;: { &quot;value&quot;: &quot;otp&quot; },
-            &quot;amr_properties&quot;: {
-              &quot;one_of&quot;: [
-                {
-                  &quot;otp_format&quot;: { &quot;value&quot;: &quot;alphanumeric&quot; }
-                },
-                {
-                  &quot;otp_format&quot;: { &quot;value&quot;: &quot;numeric&quot; }
-                }
-              ]
-            }
-          },
-          {
-            &quot;amr_identifier&quot;: { &quot;value&quot;: &quot;face&quot; }
-          }
-        ]
-      }
-    }
-  }
-}
-</sourcecode>
-</section>
+]]></sourcecode>
 </section>
 
-<section anchor="using-max-and-min-operators"><name>Using <tt>max</tt> and <tt>min</tt> Operators</name>
-<t>The following example demonstrates how to request an OTP Authentication Method with specific length constraints using the <tt>min</tt> and <tt>max</tt> operators:</t>
+<section anchor="using-all-of-and-one-of"><name>Using <tt>all_of</tt> and <tt>one_of</tt></name>
+<t>The following essential expression represents <tt>(pwd AND pop) OR otp</tt>:</t>
 
-<sourcecode type="json">{
-  &quot;claims&quot;: {
-    &quot;id_token&quot;: {
-      &quot;amr_details&quot;: {
-        &quot;amr_identifier&quot;: { &quot;value&quot;: &quot;otp&quot; },
-        &quot;amr_properties&quot;: {
-          &quot;otp_length&quot;: { &quot;min&quot;: 6, &quot;max&quot;: 10 }
-        }
-      }
-    }
-  }
-}
-</sourcecode>
-</section>
-
-<section anchor="using-max-age-operator"><name>Using <tt>max_age</tt> Operator</name>
-<t>The following example demonstrates how to request a biometric Authentication Method (<tt>face</tt>) with a requirement that the verification must have occurred within the last 300 seconds relative to the current processing time:</t>
-
-<sourcecode type="json">{
-  &quot;claims&quot;: {
-    &quot;id_token&quot;: {
-      &quot;amr_details&quot;: {
-        &quot;amr_identifier&quot;: { &quot;value&quot;: &quot;face&quot; },
-        &quot;amr_metadata&quot;  : {
-          &quot;time&quot;: { &quot;max_age&quot;: 300 }
-        }
-      }
-    }
-  }
-}
-</sourcecode>
-</section>
-
-<section anchor="combined-requirements-example"><name>Combined Requirements Example</name>
-<t>In this example, the RP expresses a complex Authentication Requirement where the End-User must authenticate using a password (<tt>pwd</tt>) and either a one-time password (<tt>otp</tt>) or facial recognition (<tt>face</tt>) with specific constraints:</t>
-
-<sourcecode type="json">{
-  &quot;claims&quot;: {
-    &quot;id_token&quot;: {
-      &quot;amr_details&quot;: {
-        &quot;all_of&quot;: [
+<sourcecode type="json"><![CDATA[{
+  "claims": {
+    "id_token": {
+      "amr_details": {
+        "essential": true,
+        "one_of": [
           {
-            &quot;amr_identifier&quot;: { &quot;value&quot;: &quot;pwd&quot;, &quot;essential&quot;: true }
-          },
-          {
-            &quot;one_of&quot;: [
-              {
-                &quot;amr_identifier&quot;: { &quot;value&quot;: &quot;otp&quot; },
-                &quot;amr_properties&quot;: {
-                  &quot;otp_length&quot;   : { &quot;min&quot;: 6, &quot;max&quot;: 10 },
-                  &quot;otp_algorithm&quot;: { &quot;value&quot;: &quot;TOTP&quot; }
-                }
-              },
-              {
-                &quot;amr_identifier&quot;: { &quot;value&quot;: &quot;face&quot; },
-                &quot;amr_metadata&quot;  : {
-                  &quot;time&quot;: { &quot;max_age&quot;: 300 }
-                }
-              }
+            "all_of": [
+              { "amr_identifier": { "value": "pwd" } },
+              { "amr_identifier": { "value": "pop" } }
             ]
-          }
+          },
+          { "amr_identifier": { "value": "otp" } }
         ]
       }
     }
   }
 }
-</sourcecode>
+]]></sourcecode>
+<t>Without the top-level <tt>essential</tt>, the same expression is a best-effort preference.</t>
+</section>
+
+<section anchor="essential-method-property"><name>Essential Method Property</name>
+<t>The following request requires either facial recognition with successful liveness detection or proof of possession:</t>
+
+<sourcecode type="json"><![CDATA[{
+  "claims": {
+    "id_token": {
+      "amr_details": {
+        "essential": true,
+        "one_of": [
+          {
+            "amr_identifier": { "value": "face" },
+            "amr_properties": {
+              "face_liveness_detection": {
+                "essential": true,
+                "value": true
+              }
+            }
+          },
+          { "amr_identifier": { "value": "pop" } }
+        ]
+      }
+    }
+  }
+}
+]]></sourcecode>
+<t>The locally essential property affects only the <tt>face</tt> branch. It does not become an independent requirement if the <tt>pop</tt> branch matches.</t>
+</section>
+
+<section anchor="using-min-max-and-max-age"><name>Using <tt>min</tt>, <tt>max</tt>, and <tt>max_age</tt></name>
+<t>The following essential request requires a recent OTP execution with a disclosed length between 6 and 10 digits:</t>
+
+<sourcecode type="json"><![CDATA[{
+  "claims": {
+    "id_token": {
+      "amr_details": {
+        "essential": true,
+        "amr_identifier": { "value": "otp" },
+        "amr_metadata": {
+          "time": { "essential": true, "max_age": 300 }
+        },
+        "amr_properties": {
+          "otp_length": { "essential": true, "min": 6, "max": 10 },
+          "otp_algorithm": null
+        }
+      }
+    }
+  }
+}
+]]></sourcecode>
+<t>If the existing OTP execution is older than 300 seconds, the OP must perform a fresh OTP execution to satisfy this expression. The <tt>otp_algorithm</tt> value is requested for disclosure but is not required for the method to match.</t>
+</section>
+
+<section anchor="id-token-and-userinfo-delivery"><name>ID Token and UserInfo Delivery</name>
+<t>When the <tt>id_token</tt> and <tt>userinfo</tt> members of the <tt>claims</tt> parameter contain different Claim requests, their top-level essential expressions are combined for the Authentication Request. In this example, only the ID Token Claim request is essential; the UserInfo Claim request is non-essential. If the Claim is returned in both locations, both values represent the same complete set of Authentication Method Executions, while optional fields may be disclosed independently.</t>
+
+<sourcecode type="json"><![CDATA[{
+  "claims": {
+    "id_token": {
+      "amr_details": {
+        "essential": true,
+        "amr_identifier": { "value": "face" },
+        "amr_properties": {
+          "face_liveness_detection": {
+            "essential": true,
+            "value": true
+          }
+        }
+      }
+    },
+    "userinfo": {
+      "amr_details": {
+        "amr_identifier": { "value": "face" },
+        "amr_properties": {
+          "face_recognition_algorithm": null
+        }
+      }
+    }
+  }
+}
+]]></sourcecode>
+</section>
+
+<section anchor="error-response"><name>Error Response</name>
+<t>If an essential expression cannot be satisfied, the OP returns an Authorization Error Response containing:</t>
+
+<sourcecode type="text"><![CDATA[error=unmet_authentication_requirements
+error_description=The requested authentication requirements could not be satisfied.
+]]></sourcecode>
+<t>The description does not reveal enrollment state, method availability, or verification failure.</t>
 </section>
 </section>
 
 <section anchor="sec-op-metadata-example"><name>OP Metadata</name>
 <t>The following example illustrates an OP metadata document indicating support for the <tt>amr_details</tt> Claim and Authentication Method request processing:</t>
 
-<sourcecode type="json">{
-  &quot;issuer&quot;: &quot;https://op.example.com&quot;,
-  &quot;authorization_endpoint&quot;: &quot;https://op.example.com/authorize&quot;,
-  &quot;token_endpoint&quot;: &quot;https://op.example.com/token&quot;,
-  &quot;userinfo_endpoint&quot;: &quot;https://op.example.com/userinfo&quot;,
-  &quot;jwks_uri&quot;: &quot;https://op.example.com/jwks&quot;,
-  &quot;claims_supported&quot;: [ &quot;sub&quot;, &quot;name&quot;, &quot;email&quot;, &quot;amr_details&quot; ],
-  &quot;amr_details_request_supported&quot;: true,
-  &quot;amr_identifiers_supported&quot;: [ &quot;pwd&quot;, &quot;otp&quot;, &quot;face&quot; ],
-  &quot;pwd_properties_supported&quot;: [ &quot;pwd_derivation_algorithm&quot;, &quot;pwd_policy_id&quot; ],
-  &quot;otp_properties_supported&quot;: [ &quot;otp_length&quot;, &quot;otp_algorithm&quot; ],
-  &quot;face_properties_supported&quot;: [ &quot;face_recognition_algorithm&quot;, &quot;face_image_quality&quot; ],
-  &quot;pwd_derivation_algorithm_values_supported&quot;: [ &quot;argon2id&quot;, &quot;bcrypt&quot;, &quot;scrypt&quot; ],
-  &quot;pwd_policy_id_values_supported&quot;: [ &quot;gov-password-v1&quot;, &quot;gov-password-v2&quot; ],
-  &quot;otp_algorithm_values_supported&quot;: [ &quot;TOTP&quot;, &quot;HOTP&quot; ],
-  &quot;face_recognition_algorithm_values_supported&quot;: [ &quot;cnn&quot;, &quot;eigenfaces&quot;, &quot;fisherfaces&quot; ],
-  &quot;trust_framework_values_supported&quot;: [ &quot;eidas&quot; ],
-  &quot;assurance_level_values_supported&quot;: [ &quot;low&quot;, &quot;substantial&quot;, &quot;high&quot; ],
-  &quot;location_types_supported&quot;: [ &quot;ip_address&quot;, &quot;country&quot; ]
+<sourcecode type="json"><![CDATA[{
+  "issuer": "https://op.example.com",
+  "authorization_endpoint": "https://op.example.com/authorize",
+  "token_endpoint": "https://op.example.com/token",
+  "userinfo_endpoint": "https://op.example.com/userinfo",
+  "jwks_uri": "https://op.example.com/jwks",
+  "claims_supported": [ "sub", "name", "email", "amr_details" ],
+  "amr_details_request_supported": true,
+  "amr_identifiers_supported": [ "pwd", "otp", "face", "pop" ],
+  "pwd_properties_supported": [ "pwd_derivation_algorithm", "pwd_policy_id" ],
+  "otp_properties_supported": [ "otp_length", "otp_algorithm" ],
+  "face_properties_supported": [ "face_recognition_algorithm", "face_liveness_detection" ],
+  "pwd_derivation_algorithm_values_supported": [ "argon2id", "bcrypt", "scrypt" ],
+  "otp_algorithm_values_supported": [ "TOTP", "HOTP" ],
+  "face_recognition_algorithm_values_supported": [ "cnn", "eigenfaces", "fisherfaces" ],
+  "trust_framework_values_supported": [ "eidas" ],
+  "assurance_level_values_supported": [ "low", "substantial", "high" ],
+  "location_types_supported": [ "ip_address", "country" ]
 }
-</sourcecode>
+]]></sourcecode>
 </section>
 </section>
 
@@ -1629,8 +1592,11 @@
 <t>[[ To be removed from the final specification ]]</t>
 <t>-00 (WG document)</t>
 
-<ul spacing="compact">
-<li>turned the proposal into a WG document</li>
+<ul>
+<li><t>turned the proposal into a WG document</t>
+</li>
+<li><t>clarified request structure, essential processing, complete-event delivery, Authentication Event consistency, error handling, WebAuthn mapping, and Discovery value advertisements</t>
+</li>
 </ul>
 </section>
 

@@ -8,6 +8,7 @@ keyword = ["authentication method", "openid", "authentication context"]
 [seriesInfo]
     name = "OpenID-Draft"
     value = "openid-connect-4-authentication-context-1_0-00"
+    stream = "IETF"
     status = "standard"
 
 [[author]]

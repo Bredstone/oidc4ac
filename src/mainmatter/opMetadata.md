@@ -1,6 +1,6 @@
 # OP Metadata {#sec-op-metadata}
 
-This specification defines additional OpenID Provider Metadata parameters ([@!OpenID.Discovery, see OpenID Connect Discovery 1.0]) that allow RPs to determine the level of support for the `amr_details` Claim and for Authentication Method requests.
+This specification defines additional OpenID Provider Metadata parameters (see OpenID Connect Discovery 1.0 [@!OpenID.Discovery]) that allow RPs to determine the level of support for the `amr_details` Claim and for Authentication Method requests.
 
 Support for this specification is intentionally divided into two distinct and independent capabilities:
 
@@ -17,7 +17,7 @@ Support for this specification is intentionally divided into two distinct and in
 
 ## Informational Support for `amr_details`
 
-An OP that is capable of returning the `amr_details` Claim as part of an ID Token or via the UserInfo Endpoint **MUST** declare this capability by including `amr_details` in the `claims_supported` metadata parameter defined by [@!OpenID.Discovery, OpenID Connect Discovery].
+An OP that is capable of returning the `amr_details` Claim as part of an ID Token or via the UserInfo Endpoint **MUST** declare this capability by including `amr_details` in the `claims_supported` metadata parameter defined by OpenID Connect Discovery [@!OpenID.Discovery].
 
 The presence of `amr_details` in `claims_supported` indicates that the OP **MAY** return the `amr_details` Claim when requested, describing the Authentication Methods used during the authentication of the End-User.
 
@@ -41,7 +41,7 @@ The following metadata parameters are OPTIONAL and provide additional informatio
 {newline="true"}
 `amr_identifiers_supported`
 
-: OPTIONAL. JSON array of strings. Enumerates Authentication Method Identifiers that the OP is capable of returning in `amr_details` and, when `amr_details_request_supported` is `true`, processing in Authentication Method Request Expressions. This parameter is an informational capability advertisement and does not assert that every listed identifier is available for every End-User or authorization transaction. Identifiers SHOULD be registered in [@!RFC8176, RFC 8176] when applicable (*e.g.*, `pwd`, `otp`, `face`, `hwk`).
+: OPTIONAL. JSON array of strings. Enumerates Authentication Method Identifiers that the OP is capable of returning in `amr_details` and, when `amr_details_request_supported` is `true`, processing in Authentication Method Request Expressions. This parameter is an informational capability advertisement and does not assert that every listed identifier is available for every End-User or authorization transaction. Identifiers SHOULD be registered in RFC 8176 [@!RFC8176] when applicable (*e.g.*, `pwd`, `otp`, `face`, `hwk`).
 
 `<amr>_properties_supported`
 

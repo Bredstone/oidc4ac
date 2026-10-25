@@ -1,6 +1,6 @@
 # Introduction
 
-[@!OpenID.Core, OpenID Connect (OIDC)] enables Relying Parties (RPs) to obtain information about an Authentication Event performed by an OpenID Provider (OP) through a small set of standardized Claims. Among these, the Authentication Methods Reference (`amr`) Claim identifies the Authentication Methods that were used to authenticate the End-User. While widely deployed, the `amr` Claim provides information at a coarse level of granularity and does not support the representation of method-specific properties, contextual information, or assurance-related characteristics. Consequently, RPs are unable to express or evaluate detailed Authentication Requirements in an interoperable manner.
+OpenID Connect (OIDC) [@!OpenID.Core] enables Relying Parties (RPs) to obtain information about an Authentication Event performed by an OpenID Provider (OP) through a small set of standardized Claims. Among these, the Authentication Methods Reference (`amr`) Claim identifies the Authentication Methods that were used to authenticate the End-User. While widely deployed, the `amr` Claim provides information at a coarse level of granularity and does not support the representation of method-specific properties, contextual information, or assurance-related characteristics. Consequently, RPs are unable to express or evaluate detailed Authentication Requirements in an interoperable manner.
 
 This specification defines an extension to OpenID Connect that introduces a structured framework for representing Authentication Methods and their associated metadata. The extension further enables Clients to request the use of specific Authentication Methods and to express constraints on their characteristics using standardized protocol elements. These capabilities enable consistent interpretation of Authentication Events across heterogeneous identity systems and support the enforcement of security, assurance, and compliance requirements.
 
@@ -8,11 +8,11 @@ The extension defined in this document is designed to be fully compatible with e
 
 ## Requirements Notation and Conventions
 
-The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be interpreted as described in [@!RFC2119, RFC 2119] and [@!RFC8174, RFC 8174].
+The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be interpreted as described in RFC 2119 [@!RFC2119] and RFC 8174 [@!RFC8174].
 
 In the .txt version of this specification, values are quoted to indicate that they are to be taken literally. When using these values in protocol messages, the quotes MUST NOT be used as part of the value. In the HTML version of this specification, values to be taken literally are indicated by the use of this fixed-width font.
 
-All uses of [@!RFC7515, JSON Web Signature (JWS)] and [@!RFC7516, JSON Web Encryption (JWE)] data structures in this specification utilize the JWS Compact Serialization or the JWE Compact Serialization; the JWS JSON Serialization and the JWE JSON Serialization are not used.
+All uses of JSON Web Signature (JWS) [@!RFC7515] and JSON Web Encryption (JWE) [@!RFC7516] data structures in this specification utilize the JWS Compact Serialization or the JWE Compact Serialization; the JWS JSON Serialization and the JWE JSON Serialization are not used.
 
 ## Scope
 
@@ -22,7 +22,7 @@ This specification does not define non-technical aspects required for the deploy
 
 ## Terminology
 
-The terminology defined in [@!OpenID.Core, OpenID Connect Core 1.0], [@!RFC6749, OAuth 2.0], and [@!RFC7519, JSON Web Token (JWT)] specifications applies throughout this document. In addition, this document defines the following terms, which are used with the meanings specified herein.
+The terminology defined in OpenID Connect Core 1.0 [@!OpenID.Core], OAuth 2.0 [@!RFC6749], and JSON Web Token (JWT) [@!RFC7519] specifications applies throughout this document. In addition, this document defines the following terms, which are used with the meanings specified herein.
 
 {newline="true"}
 **Authentication Method**
@@ -31,7 +31,7 @@ The terminology defined in [@!OpenID.Core, OpenID Connect Core 1.0], [@!RFC6749,
 
 **Authentication Method Identifier**
 
-: A standardized identifier for an Authentication Method, typically derived from registered values, such as those defined in [@!RFC8176, RFC 8176], or from values defined by local policy.
+: A standardized identifier for an Authentication Method, typically derived from registered values, such as those defined in RFC 8176 [@!RFC8176], or from values defined by local policy.
 
 **Authentication Method Execution**
 

@@ -82,7 +82,7 @@ The value of the `amr_metadata` member **MUST** be a JSON object. The following 
 
 `trust_framework`
 
-: OPTIONAL. A string identifier referencing the trust framework under which the Authentication Method was executed. The value **MUST** correspond to a trust framework defined and governed by a trust framework authority, such as a regulatory body, standards organization, or federation operator, that is applicable to the transaction context. An example value is `eidas`, which denotes an Authentication Method executed under the European [@!eIDAS, eIDAS framework].
+: OPTIONAL. A string identifier referencing the trust framework under which the Authentication Method was executed. The value **MUST** correspond to a trust framework defined and governed by a trust framework authority, such as a regulatory body, standards organization, or federation operator, that is applicable to the transaction context. An example value is `eidas`, which denotes an Authentication Method executed under the European eIDAS framework [@!eIDAS].
 
 `assurance_level`
 
@@ -90,11 +90,11 @@ The value of the `amr_metadata` member **MUST** be a JSON object. The following 
 
 `time`
 
-: REQUIRED. A timestamp indicating when the Authentication Method was successfully performed. The value **MUST** be represented in [@!RFC3339, RFC 3339] format. The OP **MUST** capture and preserve the actual execution time. The OP **MUST NOT** substitute token issuance time, authorization request time, session creation time, serialization time, or another approximate timestamp.
+: REQUIRED. A timestamp indicating when the Authentication Method was successfully performed. The value **MUST** be represented in RFC 3339 [@!RFC3339] format. The OP **MUST** capture and preserve the actual execution time. The OP **MUST NOT** substitute token issuance time, authorization request time, session creation time, serialization time, or another approximate timestamp.
 
 `location`
 
-: OPTIONAL. A JSON object providing contextual information about the geographic or network origin of the authentication. Location-related data is considered sensitive and **SHOULD** be conveyed only when explicitly requested by the RP or required by an applicable policy or trust framework. While this specification enables the representation of high-precision information, OPs **SHOULD** apply data minimization practices where possible, such as truncating IP addresses or reducing the precision of geospatial coordinates. In certain high-assurance use cases, including regulated financial transaction environments, precise origin information **MAY** be required in order to satisfy security or compliance requirements. This object **MAY** include the standard `address` elements defined in [Section 5.1.1](https://openid.net/specs/openid-connect-core-1_0.html#AddressClaim) of [@!OpenID.Core, OIDC Core], and **MAY** additionally include network-related and geospatial attributes, as defined by this specification.
+: OPTIONAL. A JSON object providing contextual information about the geographic or network origin of the authentication. Location-related data is considered sensitive and **SHOULD** be conveyed only when explicitly requested by the RP or required by an applicable policy or trust framework. While this specification enables the representation of high-precision information, OPs **SHOULD** apply data minimization practices where possible, such as truncating IP addresses or reducing the precision of geospatial coordinates. In certain high-assurance use cases, including regulated financial transaction environments, precise origin information **MAY** be required in order to satisfy security or compliance requirements. This object **MAY** include the standard `address` elements defined in [Section 5.1.1](https://openid.net/specs/openid-connect-core-1_0.html#AddressClaim) of OIDC Core [@!OpenID.Core], and **MAY** additionally include network-related and geospatial attributes, as defined by this specification.
 
     {newline="true"}
     `ip_address`
@@ -150,11 +150,11 @@ Extensions **SHOULD** follow these conventions:
 
 **Discovery Alignment**
 
-: When [@!OpenID.Discovery, OpenID Connect Discovery] is used, OPs **SHOULD** advertise supported Authentication Method Properties using the capability advertisement mechanisms defined by this specification (see (#sec-op-metadata)), enabling RPs to determine which properties may be conveyed for a given `amr_identifier`.
+: When OpenID Connect Discovery [@!OpenID.Discovery] is used, OPs **SHOULD** advertise supported Authentication Method Properties using the capability advertisement mechanisms defined by this specification (see (#sec-op-metadata)), enabling RPs to determine which properties may be conveyed for a given `amr_identifier`.
 
 ## Authentication Method Properties Profiles {#sec-method-properties-profiles}
 
-This section defines baseline vocabularies for method-specific `amr_properties`. The set of Authentication Methods addressed by this specification is derived from commonly deployed methods as described in [@!RFC8176, RFC 8176]. Not all Authentication Methods defined therein are associated with a distinct profile in this section.
+This section defines baseline vocabularies for method-specific `amr_properties`. The set of Authentication Methods addressed by this specification is derived from commonly deployed methods as described in RFC 8176 [@!RFC8176]. Not all Authentication Methods defined therein are associated with a distinct profile in this section.
 
 Where multiple identifiers represent Authentication Methods with substantially overlapping functionality or semantics, this specification defines a profile for a representative identifier only. For example, while both `hwk` and `sc` denote hardware-based key mechanisms, a profile is defined for `hwk`, and the same profile **MAY** be applied to `sc` or equivalent identifiers by trust frameworks or deployments. Additionally, methods such as `mfa` or `mca` are intentionally omitted as they represent multi-factor or multi-channel constructs rather than standalone methods.
 
@@ -378,11 +378,11 @@ Hardware Secured Key Proof-of-Possession methods involve the use of cryptographi
 
 `hwk_cert_valid_from`
 
-: OPTIONAL. A timestamp indicating the start of the validity period of the X.509 certificate associated with the hardware key, if applicable. The value **MUST** be represented in [@!RFC3339, RFC 3339] format.
+: OPTIONAL. A timestamp indicating the start of the validity period of the X.509 certificate associated with the hardware key, if applicable. The value **MUST** be represented in RFC 3339 [@!RFC3339] format.
 
 `hwk_cert_valid_to`
 
-: OPTIONAL. A timestamp indicating the end of the validity period of the X.509 certificate associated with the hardware key, if applicable. The value **MUST** be represented in [@!RFC3339, RFC 3339] format.
+: OPTIONAL. A timestamp indicating the end of the validity period of the X.509 certificate associated with the hardware key, if applicable. The value **MUST** be represented in RFC 3339 [@!RFC3339] format.
 
 `hwk_policy_id`
 
@@ -470,11 +470,11 @@ The attributes set for Knowledge-Based Authentication (KBA) methods can vary sig
 
 `kba_last_updated_at`
 
-: OPTIONAL. A timestamp indicating when the knowledge-based questions were last updated or reviewed for accuracy and relevance. The value **MUST** be represented in [@!RFC3339, RFC 3339] format.
+: OPTIONAL. A timestamp indicating when the knowledge-based questions were last updated or reviewed for accuracy and relevance. The value **MUST** be represented in RFC 3339 [@!RFC3339] format.
 
 `kba_created_at`
 
-: OPTIONAL. A timestamp indicating when the knowledge-based questions were initially created or registered. The value **MUST** be represented in [@!RFC3339, RFC 3339] format.
+: OPTIONAL. A timestamp indicating when the knowledge-based questions were initially created or registered. The value **MUST** be represented in RFC 3339 [@!RFC3339] format.
 
 `kba_policy_id`
 
@@ -493,9 +493,9 @@ One-Time Password (OTP) authentication involves the use of a temporary, single-u
 
 : REQUIRED. A string indicating the OTP generation algorithm used. Acceptable values include (non-exhaustive):
 
-    - `TOTP`: Time-based One-Time Password, as defined in [@!RFC6238, RFC 6238].
+    - `TOTP`: Time-based One-Time Password, as defined in RFC 6238 [@!RFC6238].
 
-    - `HOTP`: HMAC-based One-Time Password, as defined in [@!RFC4226, RFC 4226].
+    - `HOTP`: HMAC-based One-Time Password, as defined in RFC 4226 [@!RFC4226].
 
 `otp_format`
 
@@ -527,7 +527,7 @@ One-Time Password (OTP) authentication involves the use of a temporary, single-u
 
 `otp_delivery_time`
 
-: OPTIONAL. A timestamp indicating when the OTP was delivered to the End-User. The value **MUST** be represented in [@!RFC3339, RFC 3339] format. This attribute **MUST** only be used if the OTP was delivered through an out-of-band channel.
+: OPTIONAL. A timestamp indicating when the OTP was delivered to the End-User. The value **MUST** be represented in RFC 3339 [@!RFC3339] format. This attribute **MUST** only be used if the OTP was delivered through an out-of-band channel.
 
 `otp_max_attempts`
 
@@ -572,11 +572,11 @@ Personal Identification Number (PIN) refers to knowledge-based authentication us
 
 `pin_last_updated_at`
 
-: OPTIONAL. A timestamp indicating when the PIN was last set or updated. The value **MUST** be represented in [@!RFC3339, RFC 3339] format.
+: OPTIONAL. A timestamp indicating when the PIN was last set or updated. The value **MUST** be represented in RFC 3339 [@!RFC3339] format.
 
 `pin_created_at`
 
-: OPTIONAL. A timestamp indicating when the PIN was initially created. The value **MUST** be represented in [@!RFC3339, RFC 3339] format.
+: OPTIONAL. A timestamp indicating when the PIN was initially created. The value **MUST** be represented in RFC 3339 [@!RFC3339] format.
 
 `pin_policy_id`
 
@@ -591,9 +591,9 @@ Password metadata is primarily intended to support auditability and assurance ev
 
 : REQUIRED. A string indicating the password hashing or derivation algorithm used to store or verify the password. The value **MUST** correspond to a standardized password-based key derivation or hash function defined in relevant specifications. Acceptable values include (non-exhaustive):
 
-  - `pbkdf2`, defined in [@!RFC8018, RFC 8018];
-  - `scrypt`, defined in [@!RFC7914, RFC 7914];
-  - `argon2id`, defined in [@!RFC9106, RFC 9106];
+  - `pbkdf2`, defined in RFC 8018 [@!RFC8018];
+  - `scrypt`, defined in RFC 7914 [@!RFC7914];
+  - `argon2id`, defined in RFC 9106 [@!RFC9106];
   - `sha256` or `sha512`, if a raw cryptographic hash is used, as registered in the [IANA Named Information Hash Algorithm registry](https://www.iana.org/assignments/named-information).
 
 `pwd_iterations`
@@ -606,11 +606,11 @@ Password metadata is primarily intended to support auditability and assurance ev
 
 `pwd_last_updated_at`
 
-: OPTIONAL. A timestamp indicating when the password was last set or updated. The value **MUST** be represented in [@!RFC3339, RFC 3339] format.
+: OPTIONAL. A timestamp indicating when the password was last set or updated. The value **MUST** be represented in RFC 3339 [@!RFC3339] format.
 
 `pwd_created_at`
 
-: OPTIONAL. A timestamp indicating when the password was initially created. The value **MUST** be represented in [@!RFC3339, RFC 3339] format.
+: OPTIONAL. A timestamp indicating when the password was initially created. The value **MUST** be represented in RFC 3339 [@!RFC3339] format.
 
 `pwd_policy_id`
 
@@ -680,7 +680,7 @@ Short Message Service (SMS)-based authentication is a widely adopted method for 
 
 `sms_delivery_time`
 
-: OPTIONAL. A timestamp indicating when the SMS message containing the authentication code was sent to the End-User. The value **MUST** be represented in [@!RFC3339, RFC 3339] format.
+: OPTIONAL. A timestamp indicating when the SMS message containing the authentication code was sent to the End-User. The value **MUST** be represented in RFC 3339 [@!RFC3339] format.
 
 `sms_origin`
 
@@ -789,11 +789,11 @@ Similar to Hardware Secured Key methods, Software Secured Key Proof-of-Possessio
 
 `swk_cert_valid_from`
 
-: OPTIONAL. A timestamp indicating the start of the validity period of the X.509 certificate associated with the software key, if applicable. The value **MUST** be represented in [@!RFC3339, RFC 3339] format.
+: OPTIONAL. A timestamp indicating the start of the validity period of the X.509 certificate associated with the software key, if applicable. The value **MUST** be represented in RFC 3339 [@!RFC3339] format.
 
 `swk_cert_valid_to`
 
-: OPTIONAL. A timestamp indicating the end of the validity period of the X.509 certificate associated with the software key, if applicable. The value **MUST** be represented in [@!RFC3339, RFC 3339] format.
+: OPTIONAL. A timestamp indicating the end of the validity period of the X.509 certificate associated with the software key, if applicable. The value **MUST** be represented in RFC 3339 [@!RFC3339] format.
 
 `swk_policy_id`
 
@@ -826,7 +826,7 @@ Telephone-based Authentication Methods utilize telephony channels to verify the 
 
 `tel_call_time`
 
-: OPTIONAL. A timestamp indicating when the telephone call for authentication was initiated or received. The value **MUST** be represented in [@!RFC3339, RFC 3339] format.
+: OPTIONAL. A timestamp indicating when the telephone call for authentication was initiated or received. The value **MUST** be represented in RFC 3339 [@!RFC3339] format.
 
 `tel_call_duration`
 
