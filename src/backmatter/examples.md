@@ -4,7 +4,7 @@ All examples in this appendix are non-normative and provided for illustrative pu
 
 ## Authentication Method Representation {#sec-auth-method-representation-examples}
 
-The following example represents the complete Authentication Event relied upon for an authorization in which the End-User used a password and an OTP provided by an external authentication broker:
+The following example represents the complete Authentication Event relied upon for an authentication in which the End-User used a password and an OTP provided by an external authentication broker:
 
 ```JSON
 {
@@ -41,9 +41,9 @@ The following example represents the complete Authentication Event relied upon f
 
 ## Authentication Method Request {#sec-auth-method-request-examples}
 
-### Voluntary and Essential Claim Requests
+### Non-Essential and Essential Claim Requests
 
-A voluntary unconstrained request asks for the complete Claim when available:
+A non-essential, unconstrained request asks for the complete Claim when available, without specifying Authentication Methods (see (#essential-logic)):
 
 ```json
 {
@@ -69,7 +69,7 @@ An essential unconstrained request requires the complete Claim without prescribi
 
 ### Essential Single-Method Request
 
-The following request requires the Authentication Event to include facial recognition. Additional methods are not prohibited:
+The following request requires the Authentication Event to include facial recognition. Additional methods are not prohibited nor required:
 
 ```json
 {
@@ -169,7 +169,7 @@ If the existing OTP execution is older than 300 seconds, the OP must perform a f
 
 ### ID Token and UserInfo Delivery
 
-When ID Token and UserInfo contain different requests, their essential expressions are combined for the authorization transaction. Both returned Claims represent the same complete set of Authentication Method Executions, while optional fields may be disclosed independently.
+When the `id_token` and `userinfo` members of the `claims` parameter contain different Claim requests, their top-level essential expressions are combined for the Authentication Request. In this example, only the ID Token Claim request is essential; the UserInfo Claim request is non-essential. If the Claim is returned in both locations, both values represent the same complete set of Authentication Method Executions, while optional fields may be disclosed independently.
 
 ```json
 {

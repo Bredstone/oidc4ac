@@ -39,7 +39,7 @@ The terminology defined in [@!OpenID.Core, OpenID Connect Core 1.0], [@!RFC6749,
 
 **Authentication Event**
 
-: The complete set of successful Authentication Method Executions relied upon by the OP for a specific authorization. An Authentication Event may comprise multiple Authentication Methods performed sequentially, in combination, or reused from an existing SSO session.
+: The complete set of successful Authentication Method Executions relied upon by the OP to establish the End-User's identity. An Authentication Event may comprise multiple Authentication Methods performed sequentially, in combination, or reused from an existing SSO session.
 
 **Authentication Method Properties**
 
@@ -53,21 +53,17 @@ The terminology defined in [@!OpenID.Core, OpenID Connect Core 1.0], [@!RFC6749,
 
 : The aggregate set of Authentication Methods, Authentication Method Properties, and Authentication Method Metadata associated with an Authentication Event.
 
-**Authentication Context Snapshot**
-
-: An immutable record of the Authentication Event associated with a specific authorization grant. In an SSO session, multiple authorization grants can rely on different subsets of previously performed or newly performed Authentication Method Executions; each grant therefore has its own snapshot.
-
 **Authentication Method Request Expression**
 
 : A structured condition expressed by an RP that constrains the Authentication Methods used in an Authentication Event or their associated Authentication Method Properties and Authentication Method Metadata. Depending on the request context, the expression can represent either an Authentication Requirement or an Authentication Preference.
 
 **Authentication Requirement**
 
-: An Authentication Method Request Expression that should be satisfied by the OP in order for the authorization request to succeed.
+: An Authentication Method Request Expression that must be satisfied by an OP supporting request processing for the Authentication Request to succeed.
 
 **Authentication Preference**
 
-: An Authentication Method Request Expression that the OP should attempt to satisfy, but that does not prevent the authorization request from succeeding if it cannot be satisfied.
+: An Authentication Method Request Expression that the OP should attempt to satisfy, but that does not prevent the Authentication Request from succeeding if it cannot be satisfied.
 
 
 <!-- **Source and Contextual Information** -->

@@ -22,9 +22,9 @@ organization="ONRCPN"
 initials="F."
 surname="Schardong"
 fullname="Frederico Schardong"
-organization="IFRS"
+organization="UFSC"
     [author.address]
-    email = "frederico.schardong@rolante.ifrs.edu.br"
+    email = "frederico.schardong@ufsc.br"
 
 [[author]]
 initials="R."
