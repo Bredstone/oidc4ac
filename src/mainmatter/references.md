@@ -50,3 +50,13 @@
         <date day="8" month="Nov" year="2014"/>
     </front>
 </reference>
+
+<reference anchor="OpenID.UnmetAuthn" target="https://openid.net/specs/openid-connect-unmet-authentication-requirements-1_0-final.html">
+    <front>
+        <title>OpenID Connect Core Error Code unmet_authentication_requirements</title>
+        <author initials="T." surname="Lodderstedt" fullname="Torsten Lodderstedt">
+            <organization>yes.com</organization>
+        </author>
+        <date day="17" month="November" year="2022"/>
+    </front>
+</reference>

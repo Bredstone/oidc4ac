@@ -4,19 +4,21 @@ This section defines the framework used by an OP to represent Authentication Met
 
 The representation defined in this document is intended to complement, and not replace, existing OpenID Connect constructs such as the `amr` Claim defined in OpenID Connect Core. While the `amr` Claim identifies which Authentication Methods were used, it does not provide a mechanism to express method-level properties and metadata. This framework standardizes the representation of such information and enables RPs to evaluate Authentication Events based on Authentication Method Properties and Authentication Method Metadata rather than solely on method identifiers.
 
-Authentication Methods employed in an Authentication Event are represented using **AMR Details Objects**, each of which corresponds to a single Authentication Method executed by the OP. A complete Authentication Event is represented as a list of AMR Details Objects conveyed using a Claim named `amr_details`. This representation enables RPs to perform deterministic evaluation of Authentication Events, assess conformance with method-level requirements, and interpret contextual attributes relevant to assurance, compliance, and policy evaluation.
+Authentication Method Executions relied upon in an Authentication Event are represented using **AMR Details Objects**, each of which corresponds to a single successful Authentication Method Execution. A complete Authentication Event is represented as a list of AMR Details Objects conveyed using a Claim named `amr_details`. This representation enables RPs to perform deterministic evaluation of Authentication Events, assess conformance with method-level requirements, and interpret contextual attributes relevant to assurance, compliance, and policy evaluation.
 
 This specification explicitly separates the concept of *which* Authentication Methods were performed, as conveyed by the `amr` Claim, from the concept of *how* those Authentication Methods were executed, as conveyed by the `amr_details` Claim. This separation preserves backward compatibility with existing OpenID Connect deployments while enabling richer semantics.
 
-An OP implementing this specification **MUST** produce AMR Details Objects that conform to the structural and processing rules defined in this document. A RP implementing this specification **MUST** be capable of processing AMR Details Objects and, when applicable, evaluating them against Authentication Requirements expressed in authorization requests (see (#sec-req)).
+An OP implementing this specification **MUST** produce AMR Details Objects that conform to the structural and processing rules defined in this document. An RP implementing this specification **MUST** be capable of processing AMR Details Objects and, when applicable, evaluating them against Authentication Requirements expressed in Authentication Requests (see (#sec-req)).
 
 <!-- Subsequent sections define the data structures, per-Authentication Method Metadata profiles, contextual attribute vocabularies, and normative processing rules associated with this specification. -->
 
 ## AMR Details Object
 
-The `amr_details` Claim conveys the complete set of AMR Details Objects generated during an Authentication Event. The value of the `amr_details` Claim **MUST** be a JSON array, where each array element represents a single Authentication Method performed as part of the Authentication Event. Each AMR Details Object is composed of three components: an Authentication Method Identifier, Authentication Method Metadata, and Authentication Method Properties. 
+When returned, the value of the `amr_details` Claim **MUST** be a JSON array of AMR Details Objects. Each object represents a single successful Authentication Method Execution and is composed of an Authentication Method Identifier, Authentication Method Metadata, and, when available and permitted to be disclosed, Authentication Method Properties. Distinct successful executions with the same `amr_identifier` **MAY** be represented by separate AMR Details Objects. The requirements governing the Authentication Event represented by the Claim are defined in (#sec-amr-details-delivery).
 
-The following non-normative example illustrates an `amr_details` Claim representing an Authentication Event where the End-User authenticated using a password method governed by the eIDAS trust framework. The example includes source/contextual information indicating the OP as the issuer of the Authentication Method, along with method-specific metadata such as the password hashing algorithm and policy identifier.
+The set of Authentication Method Identifiers represented by `amr_details` **MUST** be consistent with the `amr` Claim. Each identifier in `amr_details` **MUST** appear in `amr`, and each concrete Authentication Method Execution represented in `amr` **MUST** be represented by at least one AMR Details Object. Aggregate `amr` values that summarize the event, such as multi-factor or multi-channel indicators, need not have a separate AMR Details Object unless they correspond to a distinct Authentication Method Execution. Repeated executions **MAY** result in repeated AMR Details Objects; the `amr` Claim does not represent execution multiplicity.
+
+The following non-normative example illustrates an `amr_details` Claim representing an Authentication Event where the End-User authenticated using a password method governed by the eIDAS trust framework. The example includes source and contextual information identifying the entity that performed the Authentication Method, along with method-specific metadata such as the password hashing algorithm and policy identifier.
 
 ```JSON
 {
@@ -47,7 +49,7 @@ The normative schema for the `amr_details` Claim is defined below.
 {newline="true"}
 `amr_details`
 
-: REQUIRED. An array of JSON objects, each corresponding to an AMR Details Object. Each object is composed of the following top-level members:
+: When the `amr_details` Claim is returned, its value **MUST** be an array of JSON objects, each corresponding to an AMR Details Object. Each object is composed of the following top-level members:
 
 `amr_identifier`
 
@@ -61,26 +63,26 @@ The normative schema for the `amr_details` Claim is defined below.
 
 : OPTIONAL. A JSON object containing Authentication Method Properties. The structure and content of this object are defined in (#sec-method-properties).
 
-**Note:** Implementations shall ignore any sub-element not defined in this specification or extensions of this specification. Extensions to this specification that specify additional sub-elements under the `amr_details` element may be created by the OpenID Foundation, ecosystem or scheme operators or singular implementers using this specification.
+**Note:** Implementations **MUST** ignore members not defined by this specification or by extensions to it. Extensions that define additional members of `amr_details` **MAY** be created by the OpenID Foundation, ecosystem or scheme operators, or individual implementers using this specification.
 
 Extensions of this specification, including trust framework definitions, can define further constraints on the data structure.
 
 ### Authentication Method Metadata Object {#sec-src}
 
-Each AMR Details Object **MAY** include exactly one Authentication Method Metadata object, conveyed using the `amr_metadata` member. this object contains source and contextual information about the Authentication Method execution. This information provides provenance and situational context that may be relevant for assurance evaluation, compliance checks, or policy enforcement by the RP.
+Each AMR Details Object **MUST** include exactly one Authentication Method Metadata object, conveyed using the `amr_metadata` member. This object contains source and contextual information about the Authentication Method Execution. This information provides provenance and situational context that may be relevant for assurance evaluation, compliance checks, or policy enforcement by the RP.
 
-It is noteworthy that this specification allows the OP to report Authentication Methods executed by external authenticators or brokers. In such cases, the `amr_metadata` attribute indicates the issuer of the Authentication Method, which may differ from the OP itself. In these scenarios, the OP acts as the aggregator and reporter of the Authentication Context. The OP includes the relevant information of the external authenticator in the `amr_metadata` element and **MAY** perform validations on the reported data based on its own security policies or trust frameworks. Regardless of the validation level performed by the OP, the RP **MUST** independently evaluate whether it trusts the reported issuers (`amr_metadata.iss`) before granting access to sensitive resources. 
+This specification allows the OP to report Authentication Methods executed by external authenticators or brokers. In such cases, the `amr_metadata.iss` member identifies the entity that performed the Authentication Method, which may differ from the OP itself. An intermediary broker that did not perform the method **MUST NOT** be identified by this member solely because it conveyed the authentication information. The OP acts as the aggregator and reporter of the Authentication Context, includes the relevant information of the external authenticator in the `amr_metadata` member, and **MAY** perform validations on the reported data based on its own security policies or trust frameworks. Regardless of the validation level performed by the OP, the RP **MUST** independently evaluate whether it trusts the reported entities (`amr_metadata.iss`) before granting access to sensitive resources.
 
-If present, the value of the `amr_metadata` member **MUST** be a JSON object. The following members are defined for the `amr_metadata` object:
+The value of the `amr_metadata` member **MUST** be a JSON object. The following members are defined for the `amr_metadata` object:
 
 {newline="true"}
 `iss`
 
-: OPTIONAL. A string identifier of the entity that performed the Authentication Method (for example, the OP itself, or an external authenticator or broker). If present, the value **MUST** be a case-sensitive URL containing a scheme and host, and MAY include a port number and path components. The URL **MUST NOT** include query or fragment components. If this member is not present, the OP indicates that it itself performed the Authentication Method.
+: OPTIONAL. A string identifier of the entity that performed the Authentication Method (for example, the OP itself, an external authenticator, or a broker that performed the method). If present, the value **MUST** be a case-sensitive URL containing a scheme and host, and **MAY** include a port number and path components. The URL **MUST NOT** include query or fragment components. If this member is not present, the OP indicates that it itself performed the Authentication Method.
 
 `trust_framework`
 
-: OPTIONAL. A string identifier referencing the trust framework under which the Authentication Method was executed. The value **MUST** correspond to a trust framework defined and governed by a trust framework authority, such as a regulatory body, standards organization, or federation operator, that is applicable to the transaction context. An example value is `eidas`, which denotes an Authentication Method executed under the European [@!eIDAS, eIDAS framework].
+: OPTIONAL. A string identifier referencing the trust framework under which the Authentication Method was executed. The value **MUST** correspond to a trust framework defined and governed by a trust framework authority, such as a regulatory body, standards organization, or federation operator, that is applicable to the transaction context. An example value is `eidas`, which denotes an Authentication Method executed under the European eIDAS framework [@!eIDAS].
 
 `assurance_level`
 
@@ -88,11 +90,11 @@ If present, the value of the `amr_metadata` member **MUST** be a JSON object. Th
 
 `time`
 
-: REQUIRED. A timestamp indicating when the Authentication Method was executed. The value **MUST** be represented in [@!RFC3339, RFC 3339] format.
+: REQUIRED. A timestamp indicating when the Authentication Method was successfully performed. The value **MUST** be represented in RFC 3339 [@!RFC3339] format. The OP **MUST** capture and preserve the actual execution time. The OP **MUST NOT** substitute token issuance time, authorization request time, session creation time, serialization time, or another approximate timestamp.
 
 `location`
 
-: OPTIONAL. A JSON object providing contextual information about the geographic or network origin of the authentication. Location-related data is considered sensitive and **SHOULD** be conveyed only when explicitly requested by the RP or required by an applicable policy or trust framework. While this specification enables the representation of high-precision information, OPs **SHOULD** apply data minimization practices where possible, such as truncating IP addresses or reducing the precision of geospatial coordinates. In certain high-assurance use cases, including regulated financial transaction environments, precise origin information **MAY** be required in order to satisfy security or compliance requirements. This object **MAY** include the standard `address` elements defined in [Section 5.1.1](https://openid.net/specs/openid-connect-core-1_0.html#AddressClaim) of [@!OpenID.Core, OIDC Core], and **MAY** additionally include network-related and geospatial attributes, as defined by this specification.
+: OPTIONAL. A JSON object providing contextual information about the geographic or network origin of the authentication. Location-related data is considered sensitive and **SHOULD** be conveyed only when explicitly requested by the RP or required by an applicable policy or trust framework. While this specification enables the representation of high-precision information, OPs **SHOULD** apply data minimization practices where possible, such as truncating IP addresses or reducing the precision of geospatial coordinates. In certain high-assurance use cases, including regulated financial transaction environments, precise origin information **MAY** be required in order to satisfy security or compliance requirements. This object **MAY** include the standard `address` elements defined in [Section 5.1.1](https://openid.net/specs/openid-connect-core-1_0.html#AddressClaim) of OIDC Core [@!OpenID.Core], and **MAY** additionally include network-related and geospatial attributes, as defined by this specification.
 
     {newline="true"}
     `ip_address`
@@ -121,6 +123,8 @@ Unless otherwise stated by a method-specific profile, the following processing r
 
 - Each member of `amr_properties` **MUST** be a JSON value whose type is consistent with the definitions in this section (string, number, boolean, object, or array). Time-related values **SHOULD** use the same formatting requirements as `amr_metadata.time` (see (#sec-src)).
 
+- A property designated as REQUIRED by an Authentication Method Properties profile is required only when the `amr_properties` object is emitted for that method. If the OP cannot truthfully provide every unconditionally REQUIRED property for the applicable profile, it **MUST** omit the entire `amr_properties` object rather than emit incomplete, inferred, or fabricated data. A property whose applicability depends on the manner in which the method was executed **MUST** state that condition explicitly. Trust frameworks or profiles **MAY** define stricter requirements.
+
 - The set of members that **MAY** appear within `amr_properties` is bound to the value of `amr_identifier`. An OP **MUST NOT** emit Authentication Method Properties that are unrelated to the referenced Authentication Method.
 
 - An OP **MUST NOT** include secrets, raw authenticators, replayable artifacts, or values that would enable offline attacks or impersonation. Prohibited content includes, but is not limited to, password hashes or salts, OTP values or seeds, biometric templates, private keys, or full device identifiers that are stable and enable cross-context correlation. When disclosure is necessary for auditability, the OP **SHOULD** prefer policy identifiers, coarse configuration descriptors, or non-sensitive measurements.
@@ -146,11 +150,11 @@ Extensions **SHOULD** follow these conventions:
 
 **Discovery Alignment**
 
-: When [@!OpenID.Discovery, OpenID Connect Discovery] is used, OPs **SHOULD** advertise supported Authentication Method Properties using the capability advertisement mechanisms defined by this specification (see (#sec-op-metadata)), enabling RPs to determine which properties may be conveyed for a given `amr_identifier`.
+: When OpenID Connect Discovery [@!OpenID.Discovery] is used, OPs **SHOULD** advertise supported Authentication Method Properties using the capability advertisement mechanisms defined by this specification (see (#sec-op-metadata)), enabling RPs to determine which properties may be conveyed for a given `amr_identifier`.
 
 ## Authentication Method Properties Profiles {#sec-method-properties-profiles}
 
-This section defines baseline vocabularies for method-specific `amr_properties`. The set of Authentication Methods addressed by this specification is derived from commonly deployed methods as described in [@!RFC8176, RFC 8176]. Not all Authentication Methods defined therein are associated with a distinct profile in this section.
+This section defines baseline vocabularies for method-specific `amr_properties`. The set of Authentication Methods addressed by this specification is derived from commonly deployed methods as described in RFC 8176 [@!RFC8176]. Not all Authentication Methods defined therein are associated with a distinct profile in this section.
 
 Where multiple identifiers represent Authentication Methods with substantially overlapping functionality or semantics, this specification defines a profile for a representative identifier only. For example, while both `hwk` and `sc` denote hardware-based key mechanisms, a profile is defined for `hwk`, and the same profile **MAY** be applied to `sc` or equivalent identifiers by trust frameworks or deployments. Additionally, methods such as `mfa` or `mca` are intentionally omitted as they represent multi-factor or multi-channel constructs rather than standalone methods.
 
@@ -293,6 +297,12 @@ Fingerprint Recognition methods involve the use of fingerprint patterns to authe
 
 : OPTIONAL. A string identifier referencing the fingerprint recognition policy under which the method was executed. The value **MUST** correspond to a policy registered in a recognized policy registry or defined by local policy.
 
+### WebAuthn and Passkeys (`pop`)
+
+A successfully verified WebAuthn assertion **MAY** be represented using the `pop` Authentication Method Identifier. The OP **MUST NOT** represent a WebAuthn assertion as `hwk` or `swk` unless it possesses trustworthy evidence supporting the corresponding key-protection classification. Backup eligibility, backup state, authenticator attachment, or an unattested AAGUID are insufficient by themselves. A non-backup-eligible credential does not by itself prove hardware protection, and software protection **MUST NOT** be inferred merely because hardware protection was not proven.
+
+WebAuthn credential identifiers, public keys, attestation material, and AAGUIDs **SHOULD** be omitted unless necessary and permitted by applicable disclosure policy. Any disclosed credential reference **MUST** follow the pairwise and opacity requirements defined for key identifiers in the `hwk` and `swk` profiles.
+
 ### Hardware Secured Key Proof-of-Possession (`hwk`)
 
 Hardware Secured Key Proof-of-Possession methods involve the use of cryptographic keys stored in secure hardware modules, such as Hardware Security Modules (HSMs), Trusted Platform Modules (TPMs), embedded Secure Elements, and other tamper-resistant cryptographic processors that ensure private keys remain within hardware boundaries. When `amr_identifier` is `hwk`, the `amr_properties` object **MAY** contain:
@@ -300,7 +310,7 @@ Hardware Secured Key Proof-of-Possession methods involve the use of cryptographi
 {newline="true"}
 `hwk_key_id`
 
-: REQUIRED. A string identifier representing the specific hardware key used during the Authentication Event. This identifier **MUST** be unique within the context of the OP and **SHOULD** be stable across Authentication Events to facilitate key management and auditing.
+: OPTIONAL. An opaque identifier representing the hardware key used during the Authentication Event. This member **SHOULD** be omitted unless it is necessary for the RP's stated purpose. When disclosed, it **MUST NOT** contain the raw credential identifier, public key, or a globally stable internal identifier, and **MUST** be pairwise with respect to the RP or sector identifier.
 
 `hwk_key_type`
 
@@ -338,7 +348,7 @@ Hardware Secured Key Proof-of-Possession methods involve the use of cryptographi
 
 `hwk_aaguid`
 
-: OPTIONAL. The Authenticator Attestation Globally Unique Identifier (AAGUID), as defined in FIDO specifications, if applicable. When present, this value **MUST** be represented as a lowercase hexadecimal string formatted in the standard 8-4-4-4-12 pattern (e.g., `123e4567-e89b-12d3-a456-426614174000`).
+: OPTIONAL. The Authenticator Attestation Globally Unique Identifier (AAGUID), as defined in FIDO specifications, if applicable. When present, this value **MUST** be represented as a lowercase hexadecimal string formatted in the standard 8-4-4-4-12 pattern (e.g., `123e4567-e89b-12d3-a456-426614174000`). An AAGUID **MUST NOT** be treated as trustworthy evidence of hardware protection unless it is supported by verified attestation and an applicable trust source.
 
 `hwk_fips_compliance`
 
@@ -368,11 +378,11 @@ Hardware Secured Key Proof-of-Possession methods involve the use of cryptographi
 
 `hwk_cert_valid_from`
 
-: OPTIONAL. A timestamp indicating the start of the validity period of the X.509 certificate associated with the hardware key, if applicable. The value **MUST** be represented in [@!RFC3339, RFC 3339] format.
+: OPTIONAL. A timestamp indicating the start of the validity period of the X.509 certificate associated with the hardware key, if applicable. The value **MUST** be represented in RFC 3339 [@!RFC3339] format.
 
 `hwk_cert_valid_to`
 
-: OPTIONAL. A timestamp indicating the end of the validity period of the X.509 certificate associated with the hardware key, if applicable. The value **MUST** be represented in [@!RFC3339, RFC 3339] format.
+: OPTIONAL. A timestamp indicating the end of the validity period of the X.509 certificate associated with the hardware key, if applicable. The value **MUST** be represented in RFC 3339 [@!RFC3339] format.
 
 `hwk_policy_id`
 
@@ -445,9 +455,9 @@ The attributes set for Knowledge-Based Authentication (KBA) methods can vary sig
 : OPTIONAL. A string indicating the category or type of knowledge-based questions used. Acceptable values include (non-exhaustive):
 
     - `static`: Questions based on static personal information typically shared during registration processes (*e.g.*, "what is your mother's maiden name?", "what is your date of birth?").
-  
+
     - `dynamic`: Dynamically generated questions based on recent or contextual information (*e.g.*, "what was the amount of your last transaction?", "which service did you access most recently?").
-  
+
     - `behavioral`: Questions based on behavioral patterns or habits of the End-User (*e.g.*, "which of these locations have you visited in the last month?").
 
 `kba_question_source`
@@ -460,11 +470,11 @@ The attributes set for Knowledge-Based Authentication (KBA) methods can vary sig
 
 `kba_last_updated_at`
 
-: OPTIONAL. A timestamp indicating when the knowledge-based questions were last updated or reviewed for accuracy and relevance. The value **MUST** be represented in [@!RFC3339, RFC 3339] format.
+: OPTIONAL. A timestamp indicating when the knowledge-based questions were last updated or reviewed for accuracy and relevance. The value **MUST** be represented in RFC 3339 [@!RFC3339] format.
 
 `kba_created_at`
 
-: OPTIONAL. A timestamp indicating when the knowledge-based questions were initially created or registered. The value **MUST** be represented in [@!RFC3339, RFC 3339] format.
+: OPTIONAL. A timestamp indicating when the knowledge-based questions were initially created or registered. The value **MUST** be represented in RFC 3339 [@!RFC3339] format.
 
 `kba_policy_id`
 
@@ -483,9 +493,9 @@ One-Time Password (OTP) authentication involves the use of a temporary, single-u
 
 : REQUIRED. A string indicating the OTP generation algorithm used. Acceptable values include (non-exhaustive):
 
-    - `TOTP`: Time-based One-Time Password, as defined in [@!RFC6238, RFC 6238].
+    - `TOTP`: Time-based One-Time Password, as defined in RFC 6238 [@!RFC6238].
 
-    - `HOTP`: HMAC-based One-Time Password, as defined in [@!RFC4226, RFC 4226].
+    - `HOTP`: HMAC-based One-Time Password, as defined in RFC 4226 [@!RFC4226].
 
 `otp_format`
 
@@ -517,7 +527,7 @@ One-Time Password (OTP) authentication involves the use of a temporary, single-u
 
 `otp_delivery_time`
 
-: OPTIONAL. A timestamp indicating when the OTP was delivered to the End-User. The value **MUST** be represented in [@!RFC3339, RFC 3339] format. This attribute **MUST** only be used if the OTP was delivered through an out-of-band channel.
+: OPTIONAL. A timestamp indicating when the OTP was delivered to the End-User. The value **MUST** be represented in RFC 3339 [@!RFC3339] format. This attribute **MUST** only be used if the OTP was delivered through an out-of-band channel.
 
 `otp_max_attempts`
 
@@ -549,7 +559,7 @@ Personal Identification Number (PIN) refers to knowledge-based authentication us
     - `alpha`: The PIN includes only alphabetic letters (A-Z, a-z).
 
     - `alphanumeric`: The PIN includes both letters and digits.
-    
+
     - `pattern`: The PIN is represented as a pattern, such as a grid-based pattern on a touchscreen device.
 
 `pin_max_attempts`
@@ -562,11 +572,11 @@ Personal Identification Number (PIN) refers to knowledge-based authentication us
 
 `pin_last_updated_at`
 
-: OPTIONAL. A timestamp indicating when the PIN was last set or updated. The value **MUST** be represented in [@!RFC3339, RFC 3339] format.
+: OPTIONAL. A timestamp indicating when the PIN was last set or updated. The value **MUST** be represented in RFC 3339 [@!RFC3339] format.
 
 `pin_created_at`
 
-: OPTIONAL. A timestamp indicating when the PIN was initially created. The value **MUST** be represented in [@!RFC3339, RFC 3339] format.
+: OPTIONAL. A timestamp indicating when the PIN was initially created. The value **MUST** be represented in RFC 3339 [@!RFC3339] format.
 
 `pin_policy_id`
 
@@ -577,13 +587,13 @@ Personal Identification Number (PIN) refers to knowledge-based authentication us
 Password metadata is primarily intended to support auditability and assurance evaluation (*e.g.*, algorithm family and governing policy), without exposing sensitive password material. When `amr_identifier` is `pwd`, the `amr_properties` object **MAY** contain:
 
 {newline="true"}
-`pwd_derivation_algorithmrithm`
+`pwd_derivation_algorithm`
 
-: REQUIRED. A string indicating the password hashing or derivation algorithm used to store or verify the password. The value must correspond to a standardized password-based key derivation or hash function defined in relevant specifications. Acceptable may values include (non-exhaustive):
+: REQUIRED. A string indicating the password hashing or derivation algorithm used to store or verify the password. The value **MUST** correspond to a standardized password-based key derivation or hash function defined in relevant specifications. Acceptable values include (non-exhaustive):
 
-  - `pbkdf2`, defined in [@!RFC8018, RFC 8018];
-  - `scrypt`, defined in [@!RFC7914, RFC 7914];
-  - `argon2id`, defined in [@!RFC9106, RFC 9106];
+  - `pbkdf2`, defined in RFC 8018 [@!RFC8018];
+  - `scrypt`, defined in RFC 7914 [@!RFC7914];
+  - `argon2id`, defined in RFC 9106 [@!RFC9106];
   - `sha256` or `sha512`, if a raw cryptographic hash is used, as registered in the [IANA Named Information Hash Algorithm registry](https://www.iana.org/assignments/named-information).
 
 `pwd_iterations`
@@ -596,11 +606,11 @@ Password metadata is primarily intended to support auditability and assurance ev
 
 `pwd_last_updated_at`
 
-: OPTIONAL. A timestamp indicating when the password was last set or updated. The value **MUST** be represented in [@!RFC3339, RFC 3339] format.
+: OPTIONAL. A timestamp indicating when the password was last set or updated. The value **MUST** be represented in RFC 3339 [@!RFC3339] format.
 
 `pwd_created_at`
 
-: OPTIONAL. A timestamp indicating when the password was initially created. The value **MUST** be represented in [@!RFC3339, RFC 3339] format.
+: OPTIONAL. A timestamp indicating when the password was initially created. The value **MUST** be represented in RFC 3339 [@!RFC3339] format.
 
 `pwd_policy_id`
 
@@ -670,7 +680,7 @@ Short Message Service (SMS)-based authentication is a widely adopted method for 
 
 `sms_delivery_time`
 
-: OPTIONAL. A timestamp indicating when the SMS message containing the authentication code was sent to the End-User. The value **MUST** be represented in [@!RFC3339, RFC 3339] format.
+: OPTIONAL. A timestamp indicating when the SMS message containing the authentication code was sent to the End-User. The value **MUST** be represented in RFC 3339 [@!RFC3339] format.
 
 `sms_origin`
 
@@ -705,7 +715,7 @@ Similar to Hardware Secured Key methods, Software Secured Key Proof-of-Possessio
 {newline="true"}
 `swk_key_id`
 
-: REQUIRED. A string identifier representing the specific software key used during the Authentication Event. This identifier **MUST** be unique within the context of the OP and **SHOULD** be stable across Authentication Events to facilitate key management and auditing.
+: OPTIONAL. An opaque identifier representing the software key used during the Authentication Event. This member **SHOULD** be omitted unless it is necessary for the RP's stated purpose. When disclosed, it **MUST NOT** contain the raw credential identifier, public key, or a globally stable internal identifier, and **MUST** be pairwise with respect to the RP or sector identifier.
 
 `swk_key_type`
 
@@ -779,11 +789,11 @@ Similar to Hardware Secured Key methods, Software Secured Key Proof-of-Possessio
 
 `swk_cert_valid_from`
 
-: OPTIONAL. A timestamp indicating the start of the validity period of the X.509 certificate associated with the software key, if applicable. The value **MUST** be represented in [@!RFC3339, RFC 3339] format.
+: OPTIONAL. A timestamp indicating the start of the validity period of the X.509 certificate associated with the software key, if applicable. The value **MUST** be represented in RFC 3339 [@!RFC3339] format.
 
 `swk_cert_valid_to`
 
-: OPTIONAL. A timestamp indicating the end of the validity period of the X.509 certificate associated with the software key, if applicable. The value **MUST** be represented in [@!RFC3339, RFC 3339] format.
+: OPTIONAL. A timestamp indicating the end of the validity period of the X.509 certificate associated with the software key, if applicable. The value **MUST** be represented in RFC 3339 [@!RFC3339] format.
 
 `swk_policy_id`
 
@@ -816,7 +826,7 @@ Telephone-based Authentication Methods utilize telephony channels to verify the 
 
 `tel_call_time`
 
-: OPTIONAL. A timestamp indicating when the telephone call for authentication was initiated or received. The value **MUST** be represented in [@!RFC3339, RFC 3339] format.
+: OPTIONAL. A timestamp indicating when the telephone call for authentication was initiated or received. The value **MUST** be represented in RFC 3339 [@!RFC3339] format.
 
 `tel_call_duration`
 
@@ -938,73 +948,3 @@ Windows Integrated Authentication (WIA) leverages the authentication mechanisms 
 `wia_policy_id`
 
 : OPTIONAL. A string identifier referencing the Windows Integrated Authentication policy under which the method was executed. The value **MUST** correspond to a policy registered in a recognized policy registry or defined by local policy.
-
-## `amr_details` Delivery
-
-This section defines the rules governing *when* and *how* the `amr_details` Claim is returned by the OP.
-
-The delivery of the `amr_details` Claim follows the general OIDC principles for Claims issuance defined in [Section 5](https://openid.net/specs/openid-connect-core-1_0.html#Claims) of [@!OpenID.Core, OIDC Core], allowing OPs to apply internal policies, trust frameworks, and regulatory requirements while ensuring deterministic behavior when the Claim is explicitly requested by the RP.
-
-### Conditions for Delivery of the `amr_details` Claim
-
-An OP is not required to return the `amr_details` Claim unless it is explicitly requested by the RP.
-
-When requested, the OP **MUST** evaluate the request according to its declared capabilities and the processing rules defined in this specification (see (#sec-processing-requirements)).
-
-Notwithstanding the above, an OP **MAY** return the `amr_details` Claim without an explicit request from the RP, based on internal policies, trust frameworks, regulatory obligations, or default Claim issuance rules. The determination of such policies is outside the scope of this specification.
-
-### Delivery Mechanisms
-
-When a RP explicitly requests the `amr_details` Claim, the OP **MUST** return the Claim in the location(s) specified in the request, such as within the ID Token or via the UserInfo Endpoint, as defined by [@!OpenID.Core, OIDC Core]. If the OP is unable to populate the `amr_details` Claim for a given Authentication Event, due to lack of available information, policy restrictions, or other operational limitations, the OP **MAY** omit the claim. However, it **SHOULD** try to provide at least partial information whenever possible.
-
-If the RP does not explicitly request the `amr_details` Claim and the OP elects to return it based on internal policy, the OP **MAY** choose the delivery location.
-
-The content of the `amr_details` Claim returned via different delivery mechanisms **MUST** be semantically equivalent.
-
-### Privacy Considerations for Claim Delivery
-
-Given that the `amr_details` Claim may reveal sensitive information about the Authentication Context, OPs and RPs are encouraged to apply data minimization principles when requesting or returning this Claim.
-
-RPs **SHOULD** request `amr_details` only when strictly necessary for their security or compliance requirements. OPs **SHOULD** avoid returning `amr_details` by default unless required by policy or trust framework obligations.
-
-Below is an example of an ID Token payload including the `amr_details` Claim:
-
-```json
-{
-  "iss"        : "https://server.example.com",
-  "sub"        : "248289761",
-  "aud"        : "https://rs.example.com/",
-  "exp"        : 1544645174,
-  "client_id"  : "client",
-  "amr"        : [ "pwd", "otp" ],
-  "amr_details": [
-    {
-      "amr_identifier": "pwd",
-      "amr_metadata"  : {
-        "iss"            : "https://idp.gov.com",
-        "trust_framework": "eidas",
-        "assurance_level": "low",
-        "time"           : "2025-09-30T18:23:41Z"
-      },
-      "amr_properties": {
-        "pwd_derivation_algorithm": "argon2id",
-        "pwd_policy_id"           : "govbr-password-v2"
-      }
-    },
-    {
-      "amr_identifier": "otp",
-      "amr_metadata"  : {
-        "iss"            : "https://broker.example.org",
-        "trust_framework": "eidas",
-        "assurance_level": "substantial",
-        "time"           : "2025-09-30T18:23:55Z"
-      },
-      "amr_properties": {
-        "otp_algorithm"   : "TOTP",
-        "otp_length"      : 6,
-        "otp_time_to_live": 60
-      }
-    }
-  ]
-}
-```

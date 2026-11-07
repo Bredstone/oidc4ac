@@ -1,6 +1,6 @@
 # Introduction
 
-[@!OpenID.Core, OpenID Connect (OIDC)] enables Relying Parties (RPs) to obtain information about an Authentication Event performed by an OpenID Provider (OP) through a small set of standardized Claims. Among these, the Authentication Methods Reference (`amr`) Claim, identifies the Authentication Methods that were used to authenticate the End-User. While widely deployed, the `amr` Claim provides information at a coarse level of granularity and does not support the representation of method-specific properties, contextual information, or assurance-related  characteristics. Consequently, RPs are unable to express or evaluate detailed Authentication Requirements in a interoperable manner.
+OpenID Connect (OIDC) [@!OpenID.Core] enables Relying Parties (RPs) to obtain information about an Authentication Event performed by an OpenID Provider (OP) through a small set of standardized Claims. Among these, the Authentication Methods Reference (`amr`) Claim identifies the Authentication Methods that were used to authenticate the End-User. While widely deployed, the `amr` Claim provides information at a coarse level of granularity and does not support the representation of method-specific properties, contextual information, or assurance-related characteristics. Consequently, RPs are unable to express or evaluate detailed Authentication Requirements in an interoperable manner.
 
 This specification defines an extension to OpenID Connect that introduces a structured framework for representing Authentication Methods and their associated metadata. The extension further enables Clients to request the use of specific Authentication Methods and to express constraints on their characteristics using standardized protocol elements. These capabilities enable consistent interpretation of Authentication Events across heterogeneous identity systems and support the enforcement of security, assurance, and compliance requirements.
 
@@ -8,11 +8,11 @@ The extension defined in this document is designed to be fully compatible with e
 
 ## Requirements Notation and Conventions
 
-The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be interpreted as described in [@!RFC2119, RFC 2119].
+The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be interpreted as described in RFC 2119 [@!RFC2119] and RFC 8174 [@!RFC8174].
 
 In the .txt version of this specification, values are quoted to indicate that they are to be taken literally. When using these values in protocol messages, the quotes MUST NOT be used as part of the value. In the HTML version of this specification, values to be taken literally are indicated by the use of this fixed-width font.
 
-All uses of [@!RFC7515, JSON Web Signature (JWS)] and [@!RFC7516, JSON Web Encryption (JWE)] data structures in this specification utilize the JWS Compact Serialization or the JWE Compact Serialization; the JWS JSON Serialization and the JWE JSON Serialization are not used.
+All uses of JSON Web Signature (JWS) [@!RFC7515] and JSON Web Encryption (JWE) [@!RFC7516] data structures in this specification utilize the JWS Compact Serialization or the JWE Compact Serialization; the JWS JSON Serialization and the JWE JSON Serialization are not used.
 
 ## Scope
 
@@ -22,7 +22,7 @@ This specification does not define non-technical aspects required for the deploy
 
 ## Terminology
 
-The terminology defined in [@!OpenID.Core, OpenID Connect Core 1.0], [@!RFC6749, OAuth 2.0], and [@!RFC7519, JSON Web Token (JWT)] specifications applies throughout this document. In addition, this document defines the following terms, which are used with the meanings specified herein.
+The terminology defined in OpenID Connect Core 1.0 [@!OpenID.Core], OAuth 2.0 [@!RFC6749], and JSON Web Token (JWT) [@!RFC7519] specifications applies throughout this document. In addition, this document defines the following terms, which are used with the meanings specified herein.
 
 {newline="true"}
 **Authentication Method**
@@ -31,11 +31,15 @@ The terminology defined in [@!OpenID.Core, OpenID Connect Core 1.0], [@!RFC6749,
 
 **Authentication Method Identifier**
 
-: A standardized identifier that references the Authentication Method typically derived from registered values, such as those defined in [@!RFC8176, RFC 8176], or from values defined by local policy.
+: A standardized identifier for an Authentication Method, typically derived from registered values, such as those defined in RFC 8176 [@!RFC8176], or from values defined by local policy.
+
+**Authentication Method Execution**
+
+: A concrete, successful application of an Authentication Method, including the actual time at which the method was successfully performed.
 
 **Authentication Event**
 
-: The execution of one or more Authentication Methods resulting in the OP establishing the End-User's identity for the purposes of an OpenID Connect flow. An Authentication Event may comprise multiple Authentication Methods performed sequentially or in combination.
+: The complete set of successful Authentication Method Executions relied upon by the OP to establish the End-User's identity. An Authentication Event may comprise multiple Authentication Methods performed sequentially, in combination, or reused from an existing SSO session.
 
 **Authentication Method Properties**
 
@@ -43,15 +47,23 @@ The terminology defined in [@!OpenID.Core, OpenID Connect Core 1.0], [@!RFC6749,
 
 **Authentication Method Metadata**
 
-: Structured information associated with an Authentication Method that describes method-independent attributes, such as time and location, operational context, or assurance-related characteristics. Interpretation of such information, including its relevance to assurance, policy, or compliance evaluation, is delegated to the applicable trust framework, regulatory environment, or deployment-specific policy. Each Authentication Method employed in an Authentication Event has its associated Authentication Method Metadata. 
+: Structured information associated with an Authentication Method that describes method-independent attributes, such as time and location, operational context, or assurance-related characteristics. Interpretation of such information, including its relevance to assurance, policy, or compliance evaluation, is delegated to the applicable trust framework, regulatory environment, or deployment-specific policy. Each Authentication Method employed in an Authentication Event has its associated Authentication Method Metadata.
 
 **Authentication Context**
 
 : The aggregate set of Authentication Methods, Authentication Method Properties, and Authentication Method Metadata associated with an Authentication Event.
 
+**Authentication Method Request Expression**
+
+: A structured condition expressed by an RP that constrains the Authentication Methods used in an Authentication Event or their associated Authentication Method Properties and Authentication Method Metadata. Depending on the request context, the expression can represent either an Authentication Requirement or an Authentication Preference.
+
 **Authentication Requirement**
 
-: A condition expressed by a Client that specifies which Authentication Methods, Authentication Method Properties or Authentication Method Metadata are required for an Authentication Event to be considered acceptable. Authentication Requirements are conveyed using request structures defined by this specification.
+: An Authentication Method Request Expression that must be satisfied by an OP supporting request processing for the Authentication Request to succeed.
+
+**Authentication Preference**
+
+: An Authentication Method Request Expression that the OP should attempt to satisfy, but that does not prevent the Authentication Request from succeeding if it cannot be satisfied.
 
 
 <!-- **Source and Contextual Information** -->
